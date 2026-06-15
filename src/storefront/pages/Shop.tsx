@@ -1,6 +1,6 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useRef } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
-import { SlidersHorizontal } from 'lucide-react'
+import { SlidersHorizontal, ArrowUpDown, Check } from 'lucide-react'
 import { getProducts, getBrands, getCategories } from '../../data/store'
 import { useAsync } from '../../lib/useAsync'
 import { effectivePrice } from '../../lib/format'
@@ -13,7 +13,6 @@ const typeBySlug: Record<string, ProductType> = {
   scooters: 'scooter',
   parts: 'part',
   accessories: 'accessory',
-  warranties: 'warranty',
 }
 
 export default function Shop() {
@@ -28,6 +27,16 @@ export default function Shop() {
 
   const [activeBrand, setActiveBrand] = useState<string | null>(brandParam)
   const [sort, setSort] = useState<SortKey>('featured')
+  const [sortOpen, setSortOpen] = useState(false)
+  const sortRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (sortRef.current && !sortRef.current.contains(e.target as Node)) setSortOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
 
   useEffect(() => setActiveBrand(brandParam), [brandParam])
 
@@ -38,9 +47,22 @@ export default function Shop() {
     const [products, brands] = data as [Product[], Brand[], Category[]]
     const brandId = brands.find((b) => b.slug === activeBrand)?.id ?? null
 
+    // Brands that own at least one scooter — used to distinguish scooter brands
+    // (Vespa, Lambretta…) from accessory brands (AGV, Pirelli…)
+    const scooterBrandIds = new Set(
+      products.filter((p) => p.type === 'scooter').map((p) => p.brandId),
+    )
+    const selectedIsScooterBrand = brandId ? scooterBrandIds.has(brandId) : false
+
     const list = products.filter((p) => {
       if (activeType && p.type !== activeType) return false
-      if (brandId && p.brandId !== brandId) return false
+      if (brandId) {
+        if (p.brandId === brandId) return true
+        // Scooter brand tab: also show universal accessories (helmets, tires)
+        // that belong to non-scooter brands so they're always visible
+        if (selectedIsScooterBrand && !scooterBrandIds.has(p.brandId) && p.type === 'accessory') return true
+        return false
+      }
       return true
     })
 
@@ -75,7 +97,7 @@ export default function Shop() {
       </header>
 
       {/* filter bar */}
-      <div className="mb-10 flex flex-col gap-4 rounded-card border border-paper-line bg-paper p-4 shadow-soft lg:flex-row lg:items-center lg:justify-between">
+      <div className="mb-10 flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
           <span className="mr-1 hidden items-center gap-1.5 text-sm font-semibold text-coal-dim sm:flex">
             <SlidersHorizontal size={15} /> Brand
@@ -90,15 +112,33 @@ export default function Shop() {
           ))}
         </div>
 
-        <select
-          value={sort}
-          onChange={(e) => setSort(e.target.value as SortKey)}
-          className="rounded-pill border border-paper-line bg-paper-soft px-4 py-2 text-sm font-semibold text-coal outline-none focus:border-carrot"
-        >
-          <option value="featured">Sort: Featured</option>
-          <option value="price-asc">Price: Low to High</option>
-          <option value="price-desc">Price: High to Low</option>
-        </select>
+        <div ref={sortRef} className="relative">
+          <button
+            onClick={() => setSortOpen((o) => !o)}
+            className={`flex items-center gap-1.5 rounded-pill px-3 py-2 text-sm font-semibold transition-colors ${sortOpen ? 'bg-carrot text-white' : 'bg-paper-soft text-coal hover:bg-paper-mute'}`}
+          >
+            <ArrowUpDown size={15} />
+            Sort
+          </button>
+          {sortOpen && (
+            <div className="absolute right-0 top-full z-20 mt-1.5 min-w-[180px] overflow-hidden rounded-xl border border-paper-line bg-paper shadow-lift">
+              {([
+                ['featured', 'Featured'],
+                ['price-asc', 'Price: Low to High'],
+                ['price-desc', 'Price: High to Low'],
+              ] as [SortKey, string][]).map(([key, label]) => (
+                <button
+                  key={key}
+                  onClick={() => { setSort(key); setSortOpen(false) }}
+                  className="flex w-full items-center justify-between px-4 py-3 text-sm font-medium text-coal transition-colors hover:bg-paper-soft"
+                >
+                  {label}
+                  {sort === key && <Check size={14} className="text-carrot" />}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {filtered.length === 0 ? (

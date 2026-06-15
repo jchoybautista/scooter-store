@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Check, ShoppingBag, ShieldCheck, Truck, RotateCcw, ChevronDown } from 'lucide-react'
+import { ArrowLeft, Check, ShoppingBag, Heart, ShieldCheck, Truck, RotateCcw, ChevronDown } from 'lucide-react'
 import { getProductBySlug, getProducts, getBrands } from '../../data/store'
 import { useAsync } from '../../lib/useAsync'
 import { formatPrice, effectivePrice } from '../../lib/format'
+import { useCart } from '../../lib/cartContext'
+import { useFavorites } from '../../lib/favoritesContext'
+import { BRANCHES } from '../../lib/branches'
 import type { Brand, Product } from '../../types'
 import ScooterArt from '../../components/ScooterArt'
 import ProductCard from '../components/ProductCard'
@@ -15,6 +18,9 @@ export default function ProductDetail() {
   const [selectedColor, setSelectedColor] = useState(0)
   const [selectedEngine, setSelectedEngine] = useState(0)
   const [openFaq, setOpenFaq] = useState<number | null>(0)
+  const [addedToCart, setAddedToCart] = useState(false)
+  const { addItem } = useCart()
+  const { isFav, toggle } = useFavorites()
 
   useEffect(() => {
     setActiveImg(0)
@@ -22,6 +28,10 @@ export default function ProductDetail() {
     setSelectedEngine(0)
     setOpenFaq(0)
   }, [slug])
+
+  useEffect(() => {
+    setActiveImg(0)
+  }, [selectedColor])
 
   const { data, loading } = useAsync<[Product | null, Product[], Brand[]]>(
     () => {
@@ -47,20 +57,36 @@ export default function ProductDetail() {
   const accent = brand?.accent ?? '#F95D0E'
   const onSale = product.salePrice !== null && product.salePrice !== undefined && product.salePrice < product.price
 
-  const galleryImages = Array.from(new Set([
-    ...product.images,
-    ...(product.heroImage ? [product.heroImage] : []),
-  ]))
+  const displayColors = (product.colors ?? []).filter((c) => c.images && c.images.length > 0)
+  const activeColor = displayColors[selectedColor]
+  const galleryImages = activeColor?.images?.length
+    ? activeColor.images
+    : Array.from(new Set([...product.images, ...(product.heroImage ? [product.heroImage] : [])]))
+
+  const handleAddToCart = () => {
+    addItem({
+      productId: product.id,
+      name: product.name,
+      price: effectivePrice(product),
+      image: galleryImages[0] ?? '',
+      type: product.type,
+      slug: product.slug,
+    })
+    setAddedToCart(true)
+    setTimeout(() => setAddedToCart(false), 2000)
+  }
 
   const related = all
     .filter((p) => p.id !== product.id && p.brandId === product.brandId)
     .slice(0, 3)
 
-  const recommended = product.type === 'scooter'
-    ? all
-        .filter((p) => (p.type === 'accessory' || p.type === 'part') && p.images.length > 0)
-        .slice(0, 4)
-    : []
+  const brandAccessories = all.filter(
+    (p) => p.id !== product.id && p.brandId === product.brandId && (p.type === 'accessory' || p.type === 'part') && p.images.length > 0,
+  )
+  const fillAccessories = all.filter(
+    (p) => p.type === 'accessory' && p.images.length > 0 && !brandAccessories.some((b) => b.id === p.id),
+  )
+  const recommended = product.type === 'scooter' ? [...brandAccessories, ...fillAccessories].slice(0, 4) : []
 
   return (
     <div className="mx-auto max-w-7xl px-5 pb-24 pt-28 lg:px-8">
@@ -78,9 +104,9 @@ export default function ProductDetail() {
           initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="overflow-hidden rounded-xl2 border border-paper-line bg-paper p-3 shadow-soft"
+          className="overflow-hidden rounded-xl2 border border-paper-line bg-paper p-3"
         >
-          <div className="overflow-hidden rounded-2xl bg-paper-soft">
+          <div className="overflow-hidden rounded-2xl bg-white">
             <div className="flex aspect-square items-center justify-center p-4">
               {galleryImages.length > 0 ? (
                 <img
@@ -94,7 +120,7 @@ export default function ProductDetail() {
               )}
             </div>
           </div>
-          {galleryImages.length > 0 && (
+          {galleryImages.length > 1 && (
             <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
               {galleryImages.map((img, i) => (
                 <button
@@ -143,13 +169,13 @@ export default function ProductDetail() {
           <p className="mt-4 leading-relaxed text-coal-muted">{product.description}</p>
 
           {/* Color selector */}
-          {product.colors && product.colors.length > 0 && (
+          {displayColors.length > 0 && (
             <div className="mt-6">
               <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-coal-dim">
-                Color: <span className="text-coal">{product.colors[selectedColor].name}</span>
+                Color: <span className="text-coal">{activeColor?.name}</span>
               </p>
               <div className="flex gap-2">
-                {product.colors.map((c, i) => (
+                {displayColors.map((c, i) => (
                   <button
                     key={c.name}
                     title={c.name}
@@ -200,22 +226,51 @@ export default function ProductDetail() {
 
           {/* CTA */}
           <div className="mt-4 flex flex-wrap gap-3">
-            <Link
-              to="/cart"
-              className="group inline-flex flex-1 items-center justify-center gap-2 rounded-pill bg-carrot px-7 py-4 font-bold text-white transition-all hover:bg-carrot-deep hover:shadow-glow"
+            <button
+              onClick={handleAddToCart}
+              disabled={product.stock === 0}
+              className="group inline-flex flex-1 items-center justify-center gap-2 rounded-pill bg-carrot px-7 py-4 font-bold text-white transition-all hover:bg-carrot-deep hover:shadow-glow disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <ShoppingBag size={18} /> Add to cart
-            </Link>
-            <Link
-              to="/shop"
-              className="inline-flex items-center justify-center rounded-pill border border-paper-line bg-paper px-7 py-4 font-bold text-coal transition-colors hover:border-coal"
+              {addedToCart ? (
+                <><Check size={18} /> Added to cart!</>
+              ) : (
+                <><ShoppingBag size={18} /> Add to cart</>
+              )}
+            </button>
+            <button
+              onClick={() => toggle(product.id)}
+              className={`inline-flex items-center justify-center gap-2 rounded-pill border-2 px-7 py-4 font-bold transition-all ${
+                isFav(product.id)
+                  ? 'border-carrot bg-carrot-wash text-carrot'
+                  : 'border-paper-line bg-paper text-coal hover:border-coal'
+              }`}
             >
-              Keep browsing
-            </Link>
+              <Heart size={18} className={isFav(product.id) ? 'fill-carrot' : ''} />
+              {isFav(product.id) ? 'Saved' : 'Add to favorites'}
+            </button>
           </div>
 
+          {/* Pickup branch selector — scooters only */}
+          {product.type === 'scooter' && (
+            <div className="mt-5">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-coal-dim">
+                Pickup Branch
+              </p>
+              <select className="w-full rounded-xl border-2 border-paper-line bg-paper px-4 py-3 text-sm font-semibold text-coal transition-colors focus:border-carrot focus:outline-none">
+                {BRANCHES.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name} — {b.address}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-2 text-xs leading-relaxed text-coal-muted">
+                In-branch pickup is required to process LTO registration and vehicle documents. Please bring a valid government ID and proof of payment.
+              </p>
+            </div>
+          )}
+
           {/* Trust badges */}
-          <div className="mt-8 grid grid-cols-3 gap-3 border-t border-paper-line pt-6">
+          <div className="mt-6 grid grid-cols-3 gap-3 border-t border-paper-line pt-6">
             {[
               { icon: Truck, label: 'Free delivery' },
               { icon: ShieldCheck, label: 'Warranty ready' },
@@ -230,75 +285,34 @@ export default function ProductDetail() {
         </div>
       </div>
 
-      {/* SPECS + CONTACT: 60/40 grid */}
-      <div className="mt-10 grid gap-6 lg:grid-cols-[3fr_2fr]">
-        {/* Technical Specifications */}
-        <div className="rounded-xl2 border border-paper-line bg-paper p-7 shadow-soft">
-          <h2 className="mb-5 font-display text-xl font-extrabold text-coal">Technical Specifications</h2>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {Object.entries(product.specs).map(([k, v]) => (
-              <div key={k} className="rounded-2xl border border-paper-line bg-paper-soft p-4">
-                <div className="text-xs uppercase tracking-wider text-coal-dim">{k}</div>
-                <div className="mt-1 font-display text-lg font-bold text-coal">{v}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Inquire with Velocità */}
-        <div className="rounded-xl2 border border-paper-line bg-paper p-7 shadow-soft">
-          <h2 className="mb-1 font-display text-xl font-extrabold text-coal">Inquire with Velocità</h2>
-          <p className="mb-5 text-xs uppercase tracking-widest text-coal-dim">Our team replies within 24 hours</p>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              const form = e.currentTarget
-              const name = (form.elements.namedItem('name') as HTMLInputElement).value
-              const email = (form.elements.namedItem('email') as HTMLInputElement).value
-              const subject = (form.elements.namedItem('subject') as HTMLInputElement).value
-              const message = (form.elements.namedItem('message') as HTMLTextAreaElement).value
-              window.location.href = `mailto:hello@velocita.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`)}`
-            }}
-            className="flex flex-col gap-3"
-          >
-            <input
-              name="name"
-              required
-              placeholder="Your name *"
-              className="rounded-xl border border-paper-line bg-paper-soft px-4 py-3 text-sm text-coal placeholder-coal-dim outline-none focus:border-carrot focus:ring-1 focus:ring-carrot"
-            />
-            <input
-              name="email"
-              type="email"
-              required
-              placeholder="Email address *"
-              className="rounded-xl border border-paper-line bg-paper-soft px-4 py-3 text-sm text-coal placeholder-coal-dim outline-none focus:border-carrot focus:ring-1 focus:ring-carrot"
-            />
-            <input
-              name="subject"
-              placeholder="Subject"
-              defaultValue={product.name}
-              className="rounded-xl border border-paper-line bg-paper-soft px-4 py-3 text-sm text-coal placeholder-coal-dim outline-none focus:border-carrot focus:ring-1 focus:ring-carrot"
-            />
-            <textarea
-              name="message"
-              rows={4}
-              placeholder="Your message…"
-              className="resize-none rounded-xl border border-paper-line bg-paper-soft px-4 py-3 text-sm text-coal placeholder-coal-dim outline-none focus:border-carrot focus:ring-1 focus:ring-carrot"
-            />
-            <button
-              type="submit"
-              className="rounded-pill bg-night px-6 py-3 font-bold text-white transition-colors hover:bg-coal"
-            >
-              Send Message →
-            </button>
-          </form>
+      {/* Technical Specifications & Features */}
+      <div className="mt-10 rounded-xl2 border border-paper-line bg-paper p-5">
+        <h2 className="mb-4 font-display text-xl font-extrabold text-coal">Technical Specifications & Features</h2>
+        <div className="grid grid-cols-2 gap-x-8 sm:grid-cols-3">
+          {Object.entries(product.specs).map(([k, v]) => (
+            <div key={k} className="flex items-center gap-3 border-b border-paper-line py-3">
+              <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-carrot/10 text-carrot">
+                <Check size={11} strokeWidth={3} />
+              </span>
+              <span className="text-sm font-medium text-coal">
+                <span className="text-coal-dim">{k}: </span>{v}
+              </span>
+            </div>
+          ))}
+          {product.features && product.features.map((f) => (
+            <div key={f} className="flex items-center gap-3 border-b border-paper-line py-3">
+              <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-carrot/10 text-carrot">
+                <Check size={11} strokeWidth={3} />
+              </span>
+              <span className="text-sm font-medium text-coal">{f}</span>
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Full description */}
       {product.longDescription && (
-        <div className="mt-8 rounded-xl2 border border-paper-line bg-paper p-8 shadow-soft">
+        <div className="mt-6 rounded-xl2 border border-paper-line bg-paper p-8">
           <h2 className="mb-5 font-display text-xl font-extrabold text-coal">
             About This {product.type.charAt(0).toUpperCase() + product.type.slice(1)}
           </h2>
@@ -310,25 +324,8 @@ export default function ProductDetail() {
         </div>
       )}
 
-      {/* Features */}
-      {product.features && product.features.length > 0 && (
-        <div className="mt-6 rounded-xl2 border border-paper-line bg-paper p-8 shadow-soft">
-          <h2 className="mb-5 font-display text-xl font-extrabold text-coal">Features</h2>
-          <div className="grid grid-cols-2 gap-x-8 sm:grid-cols-3">
-            {product.features.map((f) => (
-              <div key={f} className="flex items-center gap-3 border-b border-paper-line py-3 last:border-0">
-                <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-carrot/10 text-carrot">
-                  <Check size={11} strokeWidth={3} />
-                </span>
-                <span className="text-sm font-medium text-coal">{f}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* FAQ accordion */}
-      <div className="mt-6 rounded-xl2 border border-paper-line bg-paper p-8 shadow-soft">
+      <div className="mt-6 rounded-xl2 border border-paper-line bg-paper p-8">
         <h2 className="mb-5 font-display text-xl font-extrabold text-coal">General Questions</h2>
         <div className="space-y-2">
           {FAQS.map((faq, i) => (

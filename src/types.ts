@@ -1,7 +1,7 @@
 // Shared domain types — mirror the Supabase schema so the data layer can swap
 // from local seed data to Supabase without touching components.
 
-export type ProductType = 'scooter' | 'part' | 'accessory' | 'warranty'
+export type ProductType = 'scooter' | 'part' | 'accessory'
 
 export interface Brand {
   id: string
@@ -42,7 +42,7 @@ export interface Product {
   status: 'active' | 'draft'
   createdAt: string
   /** Available colour options shown as swatches on the detail page. */
-  colors?: { name: string; hex: string }[]
+  colors?: { name: string; hex: string; images?: string[] }[]
   /** Engine / displacement variants (e.g. ['125cc', '300cc HPE']). Hidden when absent or single entry. */
   engineVariants?: string[]
   /** Extended multi-paragraph description for the "About" section. Paragraphs separated by \n\n. */
@@ -51,20 +51,11 @@ export interface Product {
   features?: string[]
 }
 
-export interface WarrantyPlan {
-  id: string
-  name: string
-  durationMonths: number
-  price: number
-  coverage: string
-}
-
 export interface OrderItem {
   productId: string
   nameSnapshot: string
   qty: number
   unitPrice: number
-  warrantyPlanId: string | null
 }
 
 export interface Order {

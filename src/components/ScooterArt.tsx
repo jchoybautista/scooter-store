@@ -1,4 +1,4 @@
-import { Wrench, ShieldCheck, Package } from 'lucide-react'
+import { Wrench, Package } from 'lucide-react'
 import type { Product } from '../types'
 
 interface Props {
@@ -20,13 +20,13 @@ export default function ScooterArt({ product, accent, className = '' }: Props) {
         src={product.images[0]}
         alt={product.name}
         loading="lazy"
-        className={`h-full w-full object-cover ${className}`}
+        className={`h-full w-full object-contain ${className}`}
       />
     )
   }
 
   const id = product.name.replace(/\W/g, '')
-  const Icon = product.type === 'part' ? Wrench : product.type === 'warranty' ? ShieldCheck : Package
+  const Icon = product.type === 'part' ? Wrench : Package
 
   return (
     <div className={`relative h-full w-full overflow-hidden bg-paper-soft ${className}`}>

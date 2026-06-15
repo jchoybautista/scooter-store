@@ -51,20 +51,32 @@ const testimonials = [
   {
     name: 'Devid Cullen',
     role: 'Customer',
-    text: 'I Was Very Impresed Lorem posuere in miss and drana en the nisan semere sceriun amiss etiam ornare in the miss drana is lorem fermen mauris.',
+    text: 'Buying my Vespa GTS here was a fantastic experience from start to finish. The team was knowledgeable, the showroom was immaculate, and the branch pickup was seamlessly organized.',
     photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&auto=format',
   },
   {
     name: 'Piter Has',
     role: 'Customer',
-    text: 'I Was Very Impresed Lorem posuere in miss and drana en the nisan semere sceriun amiss etiam ornare in the miss drana is lorem fermen mauris.',
+    text: 'Outstanding service and a brilliant selection. I walked in not knowing which scooter to get, and walked out with exactly the right one. The staff genuinely know their machines.',
     photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop&auto=format',
   },
   {
     name: 'Kevin Martin',
     role: 'Customer',
-    text: 'I Was Very Impresed Lorem posuere in miss and drana en the nisan semere sceriun amiss etiam ornare in the miss drana is lorem fermen mauris.',
+    text: 'The whole process — from choosing the model to picking up at the BGC branch — was smooth and professional. No pressure, just honest advice. I would highly recommend Velocità.',
     photo: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&h=120&fit=crop&auto=format',
+  },
+  {
+    name: 'Marco Reyes',
+    role: 'Customer',
+    text: 'Picked up my Lambretta V200 last month and it has been an absolute joy. The accessories selection is impressive too — grabbed a helmet and exhaust kit at the same time. Five stars.',
+    photo: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=120&h=120&fit=crop&auto=format',
+  },
+  {
+    name: 'Sarah Lim',
+    role: 'Customer',
+    text: 'I appreciated how transparent everything was — pricing, specs, delivery timelines. No hidden surprises. The Makati branch team made the document process quick and straightforward.',
+    photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&auto=format',
   },
 ]
 
@@ -103,7 +115,9 @@ export default function Home() {
   const heroSlides = heroOrder
     .map((slug) => products.find((p) => p.slug === slug))
     .filter((p): p is Product => Boolean(p && p.heroImage))
-  const scooters = products.filter((p) => p.type === 'scooter')
+  const scooters = products.filter(
+    (p) => p.type === 'scooter' && p.images.some((img) => img.startsWith('/images/products/')),
+  )
 
   return (
     <div className="overflow-hidden">
@@ -558,62 +572,63 @@ function TestimonialsSection() {
   const [page, setPage] = useState(0)
   const perPage = 3
   const total = testimonials.length
+  const canPrev = page > 0
+  const canNext = (page + 1) * perPage < total
   const visible = testimonials.slice(page * perPage, page * perPage + perPage)
 
   return (
-    <section className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-[0.22em] text-carrot">— Testimonial —</p>
+    <section className="w-full bg-[#F0F0F0] py-20">
+      <div className="mx-auto max-w-7xl px-5 lg:px-8">
+        <div className="mb-14 text-center">
+          <p className="eyebrow">— Testimonial —</p>
           <h2 className="mt-2 font-display text-3xl font-extrabold text-coal sm:text-4xl">
             What Our Customers Say
           </h2>
         </div>
-        <div className="flex gap-2">
+
+        <div className="grid gap-6 md:grid-cols-3">
+          {visible.map((t) => (
+            <div key={t.name} className="bg-white p-7" style={{ borderRadius: '80px 80px 20px 20px' }}>
+              <div className="flex items-center gap-4">
+                <img
+                  src={t.photo}
+                  alt={t.name}
+                  className="h-16 w-16 shrink-0 rounded-full object-cover"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="font-bold text-coal">{t.name}</p>
+                  <p className="text-sm text-coal-muted">{t.role}</p>
+                </div>
+                <Quote size={44} className="ml-auto shrink-0 text-carrot/25" />
+              </div>
+              <p className="mt-5 min-h-[5.75rem] text-sm leading-relaxed text-coal-muted line-clamp-4">{t.text}</p>
+              <div className="mt-5 flex gap-1">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star key={i} size={18} className="fill-carrot text-carrot" />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-14 flex justify-center gap-3">
           <button
             onClick={() => setPage((p) => Math.max(0, p - 1))}
-            disabled={page === 0}
-            className="flex h-10 w-10 items-center justify-center bg-carrot text-white transition-opacity disabled:opacity-40"
+            disabled={!canPrev}
+            aria-label="Previous"
+            className="flex h-11 w-11 items-center justify-center bg-carrot text-white transition-opacity hover:opacity-80 disabled:opacity-40"
           >
             <ChevronLeft size={20} />
           </button>
           <button
-            onClick={() => setPage((p) => (p + 1) * perPage < total ? p + 1 : p)}
-            disabled={(page + 1) * perPage >= total}
-            className="flex h-10 w-10 items-center justify-center bg-carrot text-white transition-opacity disabled:opacity-40"
+            onClick={() => setPage((p) => (canNext ? p + 1 : p))}
+            disabled={!canNext}
+            aria-label="Next"
+            className="flex h-11 w-11 items-center justify-center bg-carrot text-white transition-opacity hover:opacity-80 disabled:opacity-40"
           >
             <ChevronRight size={20} />
           </button>
         </div>
-      </div>
-
-      <div className="mt-10 grid gap-6 md:grid-cols-3">
-        {visible.map((t) => (
-          <div
-            key={t.name}
-            className="bg-[#F0F0F0] p-7"
-            style={{ borderRadius: '80px 80px 20px 20px' }}
-          >
-            <div className="flex items-center gap-4">
-              <img
-                src={t.photo}
-                alt={t.name}
-                className="h-16 w-16 shrink-0 rounded-full object-cover"
-              />
-              <div className="min-w-0">
-                <p className="font-bold text-coal">{t.name}</p>
-                <p className="text-sm text-coal-muted">{t.role}</p>
-              </div>
-              <Quote size={44} className="ml-auto shrink-0 text-carrot/25" />
-            </div>
-            <p className="mt-6 text-sm leading-relaxed text-coal-muted">{t.text}</p>
-            <div className="mt-5 flex gap-1">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Star key={i} size={18} className="fill-carrot text-carrot" />
-              ))}
-            </div>
-          </div>
-        ))}
       </div>
     </section>
   )

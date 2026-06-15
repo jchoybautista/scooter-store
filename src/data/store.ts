@@ -8,9 +8,8 @@ import {
   brands as seedBrands,
   categories as seedCategories,
   products as seedProducts,
-  warrantyPlans as seedWarrantyPlans,
 } from './seed'
-import type { Brand, Category, Product, WarrantyPlan } from '../types'
+import type { Brand, Category, Product } from '../types'
 
 // Simulate a small network delay so loading states are real even on seed data.
 const delay = (ms = 120) => new Promise((r) => setTimeout(r, ms))
@@ -62,19 +61,6 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
   }
   await delay()
   return seedProducts.find((p) => p.slug === slug) ?? null
-}
-
-export async function getWarrantyPlans(): Promise<WarrantyPlan[]> {
-  if (isSupabaseConfigured && supabase) {
-    const { data, error } = await supabase
-      .from('warranty_plans')
-      .select('*')
-      .order('duration_months')
-    if (error) throw error
-    return data as WarrantyPlan[]
-  }
-  await delay()
-  return seedWarrantyPlans
 }
 
 // Synchronous helpers for relating data already in hand (no fetch needed).
