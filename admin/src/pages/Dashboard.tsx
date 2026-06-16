@@ -113,30 +113,25 @@ const loadPhGeo = () => {
   return phGeoCache
 }
 
-function MapTooltip({ x, y }: { x: number; y: number }) {
-  const W = 124
-  const H = 84
+function MapDotTooltip({ x, y, name, orders }: { x: number; y: number; name: string; orders: number }) {
+  const W = 132
+  const H = 44
   const tx = Math.max(4, Math.min(x - W / 2, MAP_W - W - 4))
-  const ty = y - H - 14 < 4 ? y + 14 : y - H - 14
+  const ty = y - H - 10 < 4 ? y + 10 : y - H - 10
   return (
     <g pointerEvents="none">
-      <rect x={tx} y={ty} width={W} height={H} rx={9} fill="#0F1117" opacity={0.96} />
-      <text x={tx + 11} y={ty + 18} fill="#fff" fontSize={9.5} fontWeight={700}>Metro Manila</text>
-      <text x={tx + 11} y={ty + 32} fill="#F9A66E" fontSize={8.5} fontWeight={600}>{BRANCH_TOTAL} total orders</text>
-      {BRANCH_MARKERS.slice(0, 3).map((b, i) => (
-        <text key={b.name} x={tx + 11} y={ty + 48 + i * 12} fill="#CBD5E1" fontSize={8}>
-          {b.name} · {b.orders} orders
-        </text>
-      ))}
+      <rect x={tx} y={ty} width={W} height={H} rx={7} fill="#0F1117" opacity={0.96} />
+      <text x={tx + 10} y={ty + 16} fill="#fff" fontSize={9.5} fontWeight={700}>{name}</text>
+      <text x={tx + 10} y={ty + 31} fill="#F9A66E" fontSize={8.5} fontWeight={600}>{orders} orders</text>
     </g>
   )
 }
 
 function PhilippinesMap() {
   const [paths, setPaths] = useState<string[]>([])
-  const [pin, setPin] = useState<[number, number] | null>(null)
+  const [pins, setPins] = useState<Array<[number, number]>>([])
   const [hoverShape, setHoverShape] = useState(false)
-  const [hoverPin, setHoverPin] = useState(false)
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
 
   useEffect(() => {
     let alive = true
@@ -146,7 +141,7 @@ function PhilippinesMap() {
         const projection = geoMercator().fitExtent([[14, 14], [MAP_W - 14, MAP_H - 14]], fc)
         const path = geoPath().projection(projection)
         setPaths(fc.features.map((f) => path(f as Feature) ?? '').filter(Boolean))
-        setPin(projection(METRO_MANILA) as [number, number])
+        setPins(BRANCH_MARKERS.map((b) => projection(b.coordinates) as [number, number]))
       })
       .catch(() => {/* silently ignore network failures */})
     return () => { alive = false }
@@ -165,19 +160,24 @@ function PhilippinesMap() {
         ))}
       </g>
 
-      {pin && (
-        <g style={{ cursor: 'pointer' }} onMouseEnter={() => setHoverPin(true)} onMouseLeave={() => setHoverPin(false)}>
-          <circle cx={pin[0]} cy={pin[1]} r={6} fill="#F95D0E" opacity={0.35}>
-            <animate attributeName="r" values="6;20;6" dur="2.4s" repeatCount="indefinite" />
-            <animate attributeName="opacity" values="0.4;0;0.4" dur="2.4s" repeatCount="indefinite" />
-          </circle>
-          <circle cx={pin[0]} cy={pin[1]} r={7} fill="#F95D0E" stroke="#fff" strokeWidth={2.5} />
-          <circle cx={pin[0]} cy={pin[1]} r={2.5} fill="#fff" />
-          {/* invisible larger hit target */}
-          <circle cx={pin[0]} cy={pin[1]} r={16} fill="transparent" />
-          {hoverPin && <MapTooltip x={pin[0]} y={pin[1]} />}
-        </g>
-      )}
+      {pins.map((pin, i) => {
+        const b = BRANCH_MARKERS[i]
+        return (
+          <g
+            key={b.name}
+            style={{ cursor: 'pointer' }}
+            onMouseEnter={() => setHoveredIdx(i)}
+            onMouseLeave={() => setHoveredIdx(null)}
+          >
+            <circle cx={pin[0]} cy={pin[1]} r={3.5} fill={b.color} stroke="#fff" strokeWidth={1.2} opacity={0.9} />
+            {/* invisible enlarged hit target */}
+            <circle cx={pin[0]} cy={pin[1]} r={9} fill="transparent" />
+            {hoveredIdx === i && (
+              <MapDotTooltip x={pin[0]} y={pin[1]} name={b.name} orders={b.orders} />
+            )}
+          </g>
+        )
+      })}
     </svg>
   )
 }
