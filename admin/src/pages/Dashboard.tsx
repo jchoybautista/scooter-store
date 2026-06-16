@@ -445,7 +445,7 @@ export default function Dashboard() {
         <div className="xl:col-span-2 bg-white rounded-2xl border border-paper-line shadow-sm overflow-hidden flex flex-col xl:h-[440px]">
           <div className="px-5 py-3.5 border-b border-paper-line shrink-0">
             <h2 className="text-[14px] font-semibold text-coal">Sales by Location</h2>
-            <p className="text-[11px] text-coal-muted mt-0.5">Orders by Metro Manila branch — hover the map for details</p>
+            <p className="text-[11px] text-coal-muted mt-0.5">Nationwide branches — hover the map for details</p>
           </div>
 
           <div className="flex-1 flex flex-col sm:flex-row overflow-hidden">
@@ -458,23 +458,33 @@ export default function Dashboard() {
 
             {/* Branch breakdown — fixed-width sidebar */}
             <div className="shrink-0 w-full sm:w-52 border-t sm:border-t-0 sm:border-l border-paper-line px-5 py-5 flex flex-col justify-center gap-4">
-              {BRANCH_MARKERS.map((b) => (
-                <div key={b.name} className="group">
-                  <div className="flex items-center justify-between text-[12px] mb-1.5">
-                    <span className="text-coal font-medium flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: b.color }} />
-                      {b.name}
-                    </span>
-                    <span className="text-coal-muted font-semibold">{b.orders} <span className="text-coal-dim font-normal">· {b.pct}%</span></span>
-                  </div>
-                  <div className="w-full h-2 bg-paper-line rounded-full overflow-hidden" title={`${b.name}: ${b.orders} orders (${b.pct}%)`}>
-                    <div
-                      className="h-full rounded-full transition-all duration-700 group-hover:brightness-110"
-                      style={{ width: `${b.pct}%`, backgroundColor: b.color }}
-                    />
-                  </div>
-                </div>
-              ))}
+              {(() => {
+                const otherOrders = BRANCH_MARKERS.slice(4).reduce((s, b) => s + b.orders, 0)
+                const sidebarItems = [
+                  ...BRANCH_MARKERS.slice(0, 4),
+                  { name: 'Other Cities', coordinates: [0, 0] as [number, number], color: '#CBD5E1', orders: otherOrders },
+                ]
+                return sidebarItems.map((b) => {
+                  const pct = Math.round((b.orders / BRANCH_TOTAL) * 100)
+                  return (
+                    <div key={b.name} className="group">
+                      <div className="flex items-center justify-between text-[12px] mb-1.5">
+                        <span className="text-coal font-medium flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: b.color }} />
+                          {b.name}
+                        </span>
+                        <span className="text-coal-muted font-semibold">{b.orders} <span className="text-coal-dim font-normal">· {pct}%</span></span>
+                      </div>
+                      <div className="w-full h-2 bg-paper-line rounded-full overflow-hidden" title={`${b.name}: ${b.orders} orders (${pct}%)`}>
+                        <div
+                          className="h-full rounded-full transition-all duration-700 group-hover:brightness-110"
+                          style={{ width: `${pct}%`, backgroundColor: b.color }}
+                        />
+                      </div>
+                    </div>
+                  )
+                })
+              })()}
             </div>
           </div>
         </div>
