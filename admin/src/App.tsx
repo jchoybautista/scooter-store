@@ -16,7 +16,7 @@ function RequireAuth() {
 
 export default function App() {
   return (
-    <BrowserRouter basename="/admin">
+    <BrowserRouter basename="/">
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route element={<RequireAuth />}>
