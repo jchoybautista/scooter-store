@@ -119,7 +119,7 @@ export default function HeroSlider({ slides, brands }: Props) {
   const navigate = useNavigate()
   const reduce = useReducedMotion()
   const [index, setIndex] = useState(0)
-  const [paused, setPaused] = useState(false)
+  const [paused] = useState(false)
   const [type, setType] = useState('scooters')
   const [brand, setBrand] = useState('')
 

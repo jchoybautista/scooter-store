@@ -82,11 +82,11 @@ export default function Shop() {
 
   const expanded = filtered.flatMap((p) => {
     const colorList = (p.colors ?? []).filter((c) => c.images && c.images.length > 0)
-    if (colorList.length === 0) return [{ product: p, key: p.id, subtitle: undefined }]
+    if (colorList.length === 0) return [{ product: p, key: p.id, subtitle: undefined as string | undefined }]
     return colorList.map((c, i) => ({
       product: { ...p, images: c.images! } as Product,
       key: `${p.id}-c${i}`,
-      subtitle: c.name,
+      subtitle: c.name as string | undefined,
     }))
   })
 
