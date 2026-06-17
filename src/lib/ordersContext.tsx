@@ -34,8 +34,8 @@ const SEED_ORDERS: Order[] = [
   {
     orderNumber: 'VLT-VESPA1',
     date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(), // 2 days ago
-    name: 'Jonathan Bautista',
-    email: 'jchoybautista@gmail.com',
+    name: 'Alex Reyes',
+    email: 'alex.reyes@velocita.ph',
     phone: '9171234567',
     items: [
       {
@@ -58,8 +58,8 @@ const SEED_ORDERS: Order[] = [
   {
     orderNumber: 'VLT-TIRE01',
     date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(), // 5 days ago
-    name: 'Jonathan Bautista',
-    email: 'jchoybautista@gmail.com',
+    name: 'Alex Reyes',
+    email: 'alex.reyes@velocita.ph',
     phone: '9171234567',
     items: [
       {
@@ -82,8 +82,8 @@ const SEED_ORDERS: Order[] = [
   {
     orderNumber: 'VLT-HELM1',
     date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 12).toISOString(), // 12 days ago
-    name: 'Jonathan Bautista',
-    email: 'jchoybautista@gmail.com',
+    name: 'Alex Reyes',
+    email: 'alex.reyes@velocita.ph',
     phone: '9171234567',
     items: [
       {

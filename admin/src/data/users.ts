@@ -25,10 +25,10 @@ const SEED_USERS: AdminUser[] = [
   // Admins
   {
     id: 'u-1',
-    firstName: 'Jonathan',
-    lastName: 'Bautista',
-    email: 'jchoybautista@gmail.com',
-    phone: '+63 917 123 4567',
+    firstName: 'Alex',
+    lastName: 'Reyes',
+    email: 'alex.reyes@velocita.ph',
+    phone: '+63 917 000 0000',
     department: 'IT',
     jobTitle: 'System Administrator',
     role: 'admin',

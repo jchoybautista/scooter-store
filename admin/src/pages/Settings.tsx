@@ -277,17 +277,17 @@ function DeleteUserModal({ user, onConfirm, onClose }: { user: AdminUser; onConf
 
 function AccountTab({ onToast }: { onToast: (msg: string) => void }) {
   const [profile, setProfile] = useState({
-    firstName: 'Jonathan',
-    lastName: 'Bautista',
-    email: 'jchoybautista@gmail.com',
-    phone: '+63 917 123 4567',
+    firstName: 'Alex',
+    lastName: 'Reyes',
+    email: 'alex.reyes@velocita.ph',
+    phone: '+63 917 000 0000',
     jobTitle: 'System Administrator',
     department: 'IT',
     bio: '',
   })
 
   const [security, setSecurity] = useState({ current: '', newPass: '', confirm: '' })
-  const [resetEmail, setResetEmail] = useState('jchoybautista@gmail.com')
+  const [resetEmail, setResetEmail] = useState('alex.reyes@velocita.ph')
 
   const inputClass = 'w-full rounded-xl border border-paper-line bg-paper-soft px-3.5 py-2.5 text-[13px] text-coal outline-none focus:border-carrot transition-colors'
   const labelClass = 'block text-[11px] font-semibold text-coal-dim uppercase tracking-widest mb-1.5'
@@ -562,7 +562,7 @@ function UsersTab({ onToast }: { onToast: (msg: string) => void }) {
                       </button>
                       <button
                         onClick={() => {
-                          if (user.id === 'u-1' || user.email === 'jchoybautista@gmail.com') {
+                          if (user.id === 'u-1' || user.email === 'alex.reyes@velocita.ph') {
                             onToast("You can't delete your own account.")
                             return
                           }

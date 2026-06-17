@@ -8,8 +8,8 @@ export interface AdminSession {
 const KEY = 'velocita_admin_session'
 
 export const MOCK_ADMIN: AdminSession = {
-  name: 'Jonathan Bautista',
-  email: 'jchoybautista@gmail.com',
+  name: 'Alex Reyes',
+  email: 'alex.reyes@velocita.ph',
   role: 'Web Admin',
   avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&auto=format',
 }

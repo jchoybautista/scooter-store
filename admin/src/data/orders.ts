@@ -28,8 +28,8 @@ const SEED_ORDERS: AdminOrder[] = [
   {
     orderNumber: 'VLT-VESPA1',
     date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    name: 'Jonathan Bautista',
-    email: 'jchoybautista@gmail.com',
+    name: 'Alex Reyes',
+    email: 'alex.reyes@velocita.ph',
     phone: '9171234567',
     items: [
       {
