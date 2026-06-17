@@ -20,6 +20,9 @@ dist-ssr
 # Superpowers brainstorm sessions
 .superpowers/
 
+# Claude local memory and settings
+.claude/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
