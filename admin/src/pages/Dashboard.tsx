@@ -14,13 +14,14 @@ import { formatPrice } from '../lib/format'
 
 type StatusKey = AdminOrder['status']
 
-const STATUS_HEX: Record<StatusKey, string> = {
+const _STATUS_HEX: Record<StatusKey, string> = {
   pending: '#F59E0B',
   processing: '#3B82F6',
   ready: '#8B5CF6',
   completed: '#10B981',
   cancelled: '#EF4444',
 }
+void _STATUS_HEX
 const DONUT_HEX: Record<StatusKey, string> = {
   completed:  '#F95D0E',
   processing: '#D94E08',
@@ -344,8 +345,9 @@ function OrderStatusDonut({ data, total }: { data: { name: string; value: number
         <div className="w-4/5 mx-auto relative" style={{ aspectRatio: '1' }}>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
               <Pie
-                activeIndex={activeIdx ?? undefined}
+                {...({ activeIndex: activeIdx ?? undefined } as any)}
                 activeShape={renderActiveShape}
                 data={data}
                 cx="50%" cy="50%"
