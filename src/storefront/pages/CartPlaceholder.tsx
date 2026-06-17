@@ -7,7 +7,7 @@ import { ShoppingBag, ArrowRight } from 'lucide-react'
  */
 export default function CartPlaceholder() {
   return (
-    <div className="mx-auto flex min-h-[70vh] max-w-2xl flex-col items-center justify-center px-5 pt-28 text-center">
+    <div className="mx-auto flex min-h-[70vh] max-w-2xl flex-col items-center justify-center px-5 pt-32 text-center">
       <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-carrot-wash text-carrot">
         <ShoppingBag size={28} />
       </div>

@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { ShoppingBag, Heart, Phone, Menu, X } from 'lucide-react'
 import Logo from '../../components/Logo'
+import TopBar from './TopBar'
 import { useCart } from '../../lib/cartContext'
 import { useFavorites } from '../../lib/favoritesContext'
+import { useAuth } from '../../lib/authContext'
 
 const links = [
   { to: '/', label: 'Home', end: true },
@@ -17,6 +19,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false)
   const { count } = useCart()
   const { count: favCount } = useFavorites()
+  const { isLoggedIn } = useAuth()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16)
@@ -26,11 +29,22 @@ export default function Navbar() {
   }, [])
 
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
-        scrolled ? 'bg-paper/90 shadow-soft backdrop-blur-xl' : 'bg-paper'
-      }`}
-    >
+    <header className="fixed inset-x-0 top-0 z-50">
+      {/* dark utility bar — slides away on scroll */}
+      <div
+        className={`bg-night transition-all duration-300 ${
+          scrolled ? 'max-h-0 overflow-hidden opacity-0' : 'max-h-16 overflow-visible opacity-100'
+        }`}
+      >
+        <TopBar />
+      </div>
+
+      {/* main navbar row */}
+      <div
+        className={`transition-all duration-300 ${
+          scrolled ? 'bg-paper/90 shadow-soft backdrop-blur-xl' : 'bg-paper'
+        }`}
+      >
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 lg:px-8">
         <div className="flex items-center gap-3">
           <Logo />
@@ -69,17 +83,17 @@ export default function Navbar() {
           </Link>
           <Link
             to="/cart"
-            className="relative flex h-11 items-center gap-2 rounded-pill bg-night px-4 text-sm font-bold text-white transition-transform hover:scale-105"
+            className="relative flex h-11 w-11 items-center justify-center rounded-pill bg-paper-soft text-coal transition-transform hover:scale-105"
             aria-label="Cart"
           >
             <ShoppingBag size={18} />
-            <span className="hidden sm:inline">Cart</span>
             {count > 0 && (
               <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-carrot text-[10px] font-extrabold text-white">
                 {count > 9 ? '9+' : count}
               </span>
             )}
           </Link>
+
           <button
             className="flex h-11 w-11 items-center justify-center rounded-pill bg-paper-soft text-coal lg:hidden"
             onClick={() => setOpen((v) => !v)}
@@ -88,6 +102,7 @@ export default function Navbar() {
             {open ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
+      </div>
       </div>
 
       {open && (
@@ -107,6 +122,19 @@ export default function Navbar() {
               {l.label}
             </NavLink>
           ))}
+          {isLoggedIn && (
+            <NavLink
+              to="/orders"
+              onClick={() => setOpen(false)}
+              className={({ isActive }) =>
+                `block rounded-xl px-4 py-3 text-base font-semibold ${
+                  isActive ? 'bg-carrot-wash text-carrot' : 'text-coal'
+                }`
+              }
+            >
+              Manage Orders
+            </NavLink>
+          )}
         </nav>
       )}
     </header>

@@ -74,7 +74,21 @@ export default function Shop() {
   }, [data, activeType, activeBrand, sort])
 
   if (loading || !data) return <ShopSkeleton />
-  const [, brands, categories] = data as [Product[], Brand[], Category[]]
+  const [products, brands, categories] = data as [Product[], Brand[], Category[]]
+
+  const visibleBrands = activeType
+    ? brands.filter((b) => products.some((p) => p.brandId === b.id && p.type === activeType))
+    : brands
+
+  const expanded = filtered.flatMap((p) => {
+    const colorList = (p.colors ?? []).filter((c) => c.images && c.images.length > 0)
+    if (colorList.length === 0) return [{ product: p, key: p.id, subtitle: undefined }]
+    return colorList.map((c, i) => ({
+      product: { ...p, images: c.images! } as Product,
+      key: `${p.id}-c${i}`,
+      subtitle: c.name,
+    }))
+  })
 
   const heading = activeType
     ? categories.find((c) => c.type === activeType)?.name ?? 'Shop'
@@ -93,7 +107,7 @@ export default function Shop() {
       <header className="mb-10">
         <p className="eyebrow">Velocità · Shop</p>
         <h1 className="mt-2 font-display text-4xl font-extrabold text-coal sm:text-5xl">{heading}</h1>
-        <p className="mt-2 text-coal-muted">{filtered.length} products available</p>
+        <p className="mt-2 text-coal-muted">{expanded.length} products available</p>
       </header>
 
       {/* filter bar */}
@@ -105,7 +119,7 @@ export default function Shop() {
           <FilterChip active={!activeBrand} onClick={() => setBrand(null)}>
             All
           </FilterChip>
-          {brands.map((b) => (
+          {visibleBrands.map((b) => (
             <FilterChip key={b.id} active={activeBrand === b.slug} onClick={() => setBrand(b.slug)}>
               {b.name}
             </FilterChip>
@@ -147,8 +161,8 @@ export default function Shop() {
         </div>
       ) : (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((p) => (
-            <ProductCard key={p.id} product={p} brand={brands.find((b) => b.id === p.brandId)} />
+          {expanded.map(({ product: p, key, subtitle }) => (
+            <ProductCard key={key} product={p} brand={brands.find((b) => b.id === p.brandId)} subtitle={subtitle} />
           ))}
         </div>
       )}

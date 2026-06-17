@@ -27,6 +27,32 @@
   }
 }
 
+@keyframes blink {
+  0%, 100% { opacity: 1 }
+  50%       { opacity: 0 }
+}
+.cursor-blink {
+  animation: blink 0.75s step-end infinite;
+}
+
+/* Cinematic hero — ambient dot-grid drift */
+@keyframes hero-grid-pan {
+  from { background-position: 0 0 }
+  to   { background-position: 34px 34px }
+}
+/* Cinematic hero — autoplay progress fill on the active slide dot */
+@keyframes hero-progress {
+  from { transform: scaleX(0) }
+  to   { transform: scaleX(1) }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-grid-pan,
+  .hero-progress-fill {
+    animation: none !important;
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

@@ -8,11 +8,12 @@ import { useFavorites } from '../../lib/favoritesContext'
 interface Props {
   product: Product
   brand?: Brand
+  subtitle?: string
 }
 
 const specIcons = [Zap, Gauge, Weight]
 
-export default function ProductCard({ product, brand }: Props) {
+export default function ProductCard({ product, brand, subtitle }: Props) {
   const accent = brand?.accent ?? '#F95D0E'
   const onSale = product.salePrice != null && product.salePrice < product.price
   const specs = Object.entries(product.specs).slice(1, 4)
@@ -70,6 +71,9 @@ export default function ProductCard({ product, brand }: Props) {
         <h3 className="mt-1 font-display text-lg font-bold leading-tight text-coal">
           {product.name}
         </h3>
+        {subtitle && (
+          <p className="mt-0.5 text-xs font-medium text-coal-dim">{subtitle}</p>
+        )}
 
         {/* spec row */}
         {specs.length > 0 && (

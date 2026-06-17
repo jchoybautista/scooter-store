@@ -11,6 +11,7 @@ import { BRANCHES } from '../../lib/branches'
 import type { Brand, Product } from '../../types'
 import ScooterArt from '../../components/ScooterArt'
 import ProductCard from '../components/ProductCard'
+import BranchSelect from '../components/BranchSelect'
 
 export default function ProductDetail() {
   const { slug } = useParams()
@@ -19,6 +20,7 @@ export default function ProductDetail() {
   const [selectedEngine, setSelectedEngine] = useState(0)
   const [openFaq, setOpenFaq] = useState<number | null>(0)
   const [addedToCart, setAddedToCart] = useState(false)
+  const [branch, setBranch] = useState(BRANCHES[0].id)
   const { addItem } = useCart()
   const { isFav, toggle } = useFavorites()
 
@@ -89,7 +91,7 @@ export default function ProductDetail() {
   const recommended = product.type === 'scooter' ? [...brandAccessories, ...fillAccessories].slice(0, 4) : []
 
   return (
-    <div className="mx-auto max-w-7xl px-5 pb-24 pt-28 lg:px-8">
+    <div className="mx-auto max-w-7xl px-5 pb-24 pt-32 lg:px-8">
       <Link
         to="/shop"
         className="inline-flex items-center gap-1.5 text-sm font-semibold text-coal-muted transition-colors hover:text-carrot"
@@ -256,14 +258,8 @@ export default function ProductDetail() {
               <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-coal-dim">
                 Pickup Branch
               </p>
-              <select className="w-full rounded-xl border-2 border-paper-line bg-paper px-4 py-3 text-sm font-semibold text-coal transition-colors focus:border-carrot focus:outline-none">
-                {BRANCHES.map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {b.name} — {b.address}
-                  </option>
-                ))}
-              </select>
-              <p className="mt-2 text-xs leading-relaxed text-coal-muted">
+              <BranchSelect value={branch} onChange={setBranch} showDetails />
+              <p className="mt-3 text-xs leading-relaxed text-coal-muted">
                 In-branch pickup is required to process LTO registration and vehicle documents. Please bring a valid government ID and proof of payment.
               </p>
             </div>
@@ -416,7 +412,7 @@ const FAQS = [
 
 function DetailSkeleton() {
   return (
-    <div className="mx-auto max-w-7xl px-5 pb-24 pt-28 lg:px-8">
+    <div className="mx-auto max-w-7xl px-5 pb-24 pt-32 lg:px-8">
       <div className="grid gap-10 lg:grid-cols-[3fr_2fr]">
         <div className="aspect-square animate-pulse rounded-xl2 bg-paper-soft" />
         <div className="space-y-4">

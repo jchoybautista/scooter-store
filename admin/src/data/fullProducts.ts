@@ -1,0 +1,960 @@
+export interface FullProduct {
+  id: string
+  name: string
+  slug: string
+  brandId: string
+  categoryId: string
+  type: 'scooter' | 'part' | 'accessory'
+  price: number
+  salePrice: number | null
+  description: string
+  specs: Record<string, string>
+  images: string[]
+  heroImage?: string
+  stock: number
+  featured: boolean
+  status: 'active' | 'draft'
+  createdAt: string
+  colors?: { name: string; hex: string; images?: string[] }[]
+  engineVariants?: string[]
+  longDescription?: string
+  features?: string[]
+}
+
+const KEY = 'velocita_products'
+const VER_KEY = 'velocita_products_v'
+const DATA_VER = 3
+
+const now = Date.now()
+const daysAgo = (d: number) => new Date(now - d * 86_400_000).toISOString()
+
+export const SEED_PRODUCTS: FullProduct[] = [
+  // ── Scooters ──────────────────────────────────────────────
+  {
+    id: 'p-vespa-gts300',
+    name: 'Vespa GTS 300 Super',
+    slug: 'vespa-gts-300-super',
+    brandId: 'b-vespa',
+    categoryId: 'c-scooter',
+    type: 'scooter',
+    price: 7899,
+    salePrice: null,
+    description:
+      'The flagship of the Vespa range. A 300cc HPE engine, full LED lighting and a hand-welded steel body deliver the most powerful, refined Vespa ever built.',
+    specs: { Engine: '278cc HPE', Power: '23.5 hp', 'Top speed': '128 km/h', Weight: '158 kg', Brakes: 'ABS disc' },
+    images: ['/images/products/Vespa GTS SUPER 300 RED PASSIONE 1.png'],
+    heroImage: '/images/hero/vespa.png',
+    stock: 6,
+    featured: true,
+    status: 'active',
+    createdAt: daysAgo(4),
+    colors: [
+      { name: 'Rosso Passione', hex: '#cc2936', images: ['/images/products/Vespa GTS SUPER 300 RED PASSIONE 1.png', '/images/products/Vespa GTS SUPER 300 RED PASSIONE 2.png', '/images/products/Vespa GTS SUPER 300 RED PASSIONE 3.png', '/images/products/Vespa GTS SUPER 300 RED PASSIONE 4.png'] },
+      { name: 'Nero Opaco', hex: '#1a1a1a', images: ['/images/products/Vespa GTS SUPER SPORT 300 BLACK OPACO 1.png', '/images/products/Vespa GTS SUPER SPORT 300 BLACK OPACO 2.png', '/images/products/Vespa GTS SUPER SPORT 300 BLACK OPACO 3.png', '/images/products/Vespa GTS SUPER SPORT 300 BLACK OPACO 4.png'] },
+      { name: 'Grigio Materia', hex: '#9ca3af', images: ['/images/products/Vespa GTS SUPER SPORT 300 GREY MATERIA 1.png', '/images/products/Vespa GTS SUPER SPORT 300 GREY MATERIA  2.png', '/images/products/Vespa GTS SUPER SPORT 300 GREY MATERIA 3.png', '/images/products/Vespa GTS SUPER SPORT 300 GREY MATERIA  4.png'] },
+      { name: 'Giallo Sole', hex: '#f4d03f', images: ['/images/products/Vespa GTS SUPER SPORT 300 YELLOW SOLE 1.png', '/images/products/Vespa GTS SUPER SPORT 300 YELLOW SOLE 2.png', '/images/products/Vespa GTS SUPER SPORT 300 YELLOW SOLE 3.png', '/images/products/Vespa GTS SUPER SPORT 300 YELLOW SOLE 4.png'] },
+    ],
+    engineVariants: ['278cc HPE', '300cc Sport'],
+    longDescription:
+      "The Vespa GTS 300 Super is the definitive expression of the Vespa ideal — an icon that has never stopped evolving. Born in 1946 in postwar Italy, Vespa has always represented freedom, elegance and effortless style on two wheels. The GTS 300 Super carries that legacy forward with uncompromising engineering and timeless design cues that are instantly recognisable from any angle.\n\nAt the heart of the GTS Super lies a 278cc HPE (High Performance Engine) single-cylinder unit delivering 23.5 hp of spirited, smooth power. Coupled with a die-cast aluminium monocoque frame and fully adjustable suspension, the ride feel is supple and confidence-inspiring whether you're threading through city traffic or cruising along a coastal road.",
+    features: [
+      'ABS Dual-Channel Braking',
+      'Full LED Lighting',
+      'Traction Control (ASR)',
+      'Keyless Start System',
+      'Colour TFT Instrument Cluster',
+      'USB-C Charging Port',
+      'Under-Seat Helmet Storage',
+      'Bluetooth Connectivity',
+      'Hand-Welded Steel Body',
+      'Adjustable Rear Suspension',
+      'Aluminium Monocoque Frame',
+      'Euro 5 Compliant Engine',
+    ],
+  },
+  {
+    id: 'p-vespa-primavera',
+    name: 'Vespa Primavera 150',
+    slug: 'vespa-primavera-150',
+    brandId: 'b-vespa',
+    categoryId: 'c-scooter',
+    type: 'scooter',
+    price: 5499,
+    salePrice: 4999,
+    description:
+      'Light, agile and endlessly charming. The Primavera 150 pairs a peppy i-get engine with the timeless silhouette that made Vespa a legend.',
+    specs: { Engine: '155cc i-get', Power: '13 hp', 'Top speed': '95 km/h', Weight: '117 kg', Brakes: 'ABS front disc' },
+    images: ['/images/products/Vespa Primavera S 125 – Green Amabile 1.png'],
+    stock: 12,
+    featured: true,
+    status: 'active',
+    createdAt: daysAgo(9),
+    colors: [
+      { name: 'Verde Amabile', hex: '#7fc97a', images: ['/images/products/Vespa Primavera S 125 – Green Amabile 1.png', '/images/products/Vespa Primavera S 125 – Green Amabile 2.png', '/images/products/Vespa Primavera S 125 – Green Amabile 3.png', '/images/products/Vespa Primavera S 125 – Green Amabile 4.png'] },
+      { name: 'Rosso', hex: '#cc2936', images: ['/images/products/Vespa Primavera RED 125 1.png', '/images/products/Vespa Primavera RED 125 2.png'] },
+      { name: 'Azzurro Capri', hex: '#6ab0c8', images: ['/images/products/Vespa Primavera S 125 – Blue Capri 1.png', '/images/products/Vespa Primavera S 125 – Blue Capri 2.png', '/images/products/Vespa Primavera S 125 – Blue Capri 3.png'] },
+    ],
+    engineVariants: ['50cc', '125cc', '150cc i-get'],
+    longDescription:
+      "The Vespa Primavera is the scooter that launched a thousand adventures. Since 1968, its fluid, organic silhouette and nimble handling have made it the favourite of style-conscious urban riders across the world. The current Primavera 150 honours that heritage while adding the modern comforts and safety features today's riders expect.\n\nThe peppy 155cc i-get engine delivers 13 hp with outstanding fuel efficiency — perfect for daily commutes and weekend rides alike. Weighing just 117 kg and fitted with a wide turning radius, the Primavera threads through city traffic with ease and grace.",
+    features: [
+      'ABS Front Disc Brake',
+      'Full LED Lighting',
+      'i-get Engine Technology',
+      'Keyless Start System',
+      'USB Charging Port',
+      'Under-Seat Helmet Storage',
+      'Adjustable Rear Shock',
+      'Chrome Exhaust Trim',
+      'Aluminium Footboards',
+      'Euro 5 Compliant',
+    ],
+  },
+  {
+    id: 'p-vespa-sprint50',
+    name: 'Vespa Sprint 50',
+    slug: 'vespa-sprint-50',
+    brandId: 'b-vespa',
+    categoryId: 'c-scooter',
+    type: 'scooter',
+    price: 4299,
+    salePrice: null,
+    description:
+      'Sporty attitude in a compact package. Square headlight, racing stance and a frugal 50cc engine perfect for the city.',
+    specs: { Engine: '49cc i-get', Power: '3.5 hp', 'Top speed': '45 km/h', Weight: '110 kg', Brakes: 'Front disc' },
+    images: ['/images/products/Vespa Sprint 125 – Yellow Curioso 1.png'],
+    stock: 18,
+    featured: false,
+    status: 'active',
+    createdAt: daysAgo(20),
+    colors: [
+      { name: 'Giallo Curioso', hex: '#f4d03f', images: ['/images/products/Vespa Sprint 125 – Yellow Curioso 1.png', '/images/products/Vespa Sprint 125 – Yellow Curioso 2.png', '/images/products/Vespa Sprint 125 – Yellow Curioso 3.png', '/images/products/Vespa Sprint 125 – Yellow Curioso 4.png'] },
+      { name: 'Grigio Intrepido', hex: '#6b7280', images: ['/images/products/Vespa Sprint S 125 – Grey Intrepido 1.png', '/images/products/Vespa Sprint S 125 – Grey Intrepido 2.png', '/images/products/Vespa Sprint S 125 – Grey Intrepido 3.png', '/images/products/Vespa Sprint S 125 – Grey Intrepido 4.png'] },
+      { name: 'Bianco Innocente', hex: '#f5f0e8', images: ['/images/products/Vespa Sprint S 150 – White Innocente 1.png', '/images/products/Vespa Sprint S 150 – White Innocente 2.png', '/images/products/Vespa Sprint S 150 – White Innocente 3.png', '/images/products/Vespa Sprint S 150 – White Innocente 4.png'] },
+      { name: 'Verde Tenace', hex: '#4a7c59', images: ['/images/products/Vespa Sprint S 150 – Green Tenace 1.png', '/images/products/Vespa Sprint S 150 – Green Tenace 2.png', '/images/products/Vespa Sprint S 150 – Green Tenace 3.png', '/images/products/Vespa Sprint S 150 – Green Tenace 4.png'] },
+    ],
+    engineVariants: ['50cc', '125cc'],
+    longDescription:
+      "The Vespa Sprint wears its sporty attitude in every line — the square headlight, the wide handlebar cowl, the racing-inspired stance. Yet underneath the bold styling lies the same hand-welded steel monocoque frame that has made Vespa the gold standard of durability for eight decades.\n\nThe frugal 50cc i-get engine makes the Sprint the ideal choice for urban riders who want maximum fuel economy without compromising on style or character. A 125cc version is also available for those who need a little more pace on mixed city and suburban routes.",
+    features: [
+      'Front Disc Brake',
+      'Full LED Headlight',
+      'i-get Engine Technology',
+      'Under-Seat Storage',
+      'USB Charging Port',
+      'Steel Monocoque Frame',
+      'Wide Turning Radius',
+      'Euro 5 Compliant',
+    ],
+  },
+  {
+    id: 'p-lambretta-v200',
+    name: 'Lambretta V200 Special',
+    slug: 'lambretta-v200-special',
+    brandId: 'b-lambretta',
+    categoryId: 'c-scooter',
+    type: 'scooter',
+    price: 5199,
+    salePrice: null,
+    description:
+      'Tailored in Milan. The V200 Special blends mod-era proportions with a smooth 169cc engine and bespoke colour-matched panels.',
+    specs: { Engine: '169cc', Power: '12.4 hp', 'Top speed': '105 km/h', Weight: '130 kg', Brakes: 'CBS disc' },
+    images: ['/images/products/Lambretta-X125-SALMON-PINK.png'],
+    heroImage: '/images/hero/lambretta.png',
+    stock: 8,
+    featured: true,
+    status: 'active',
+    createdAt: daysAgo(6),
+    colors: [
+      { name: 'Rosa Salmone', hex: '#e8998d', images: ['/images/products/Lambretta-X125-SALMON-PINK.png'] },
+      { name: 'Azzurro', hex: '#6ab0c8', images: ['/images/products/Lambretta-X125-Blue.png'] },
+      { name: 'Giallo', hex: '#f4a300', images: ['/images/products/Lambretta-X125-Yellow.png'] },
+    ],
+    engineVariants: ['125cc', '200cc'],
+    longDescription:
+      "Tailored in Milan. The Lambretta V200 Special revives the spirit of the mod era — those colour-matched side panels and clean, purposeful proportions are unmistakably Lambretta, yet the engineering beneath is thoroughly modern.\n\nA smooth 169cc fuel-injected engine delivers 12.4 hp with linear, confidence-inspiring power delivery. CBS braking, twin rear shock absorbers and a steel trellis frame ensure the V200 is as composed on fast A-roads as it is stylish on city streets.",
+    features: [
+      'CBS Disc Braking System',
+      'Full LED Lighting',
+      'Colour-Matched Side Panels',
+      'Fuel Injection System',
+      'Under-Seat Helmet Storage',
+      'Chrome Detailing',
+      'Twin Rear Shock Absorbers',
+      'Steel Trellis Frame',
+      'Euro 5 Compliant',
+    ],
+  },
+  {
+    id: 'p-lambretta-g350',
+    name: 'Lambretta G350',
+    slug: 'lambretta-g350',
+    brandId: 'b-lambretta',
+    categoryId: 'c-scooter',
+    type: 'scooter',
+    price: 6499,
+    salePrice: null,
+    description:
+      'The grand tourer of the range. A torquey 330cc engine and sculpted bodywork for confident long-distance cruising.',
+    specs: { Engine: '330cc', Power: '28.6 hp', 'Top speed': '137 km/h', Weight: '151 kg', Brakes: 'ABS dual disc' },
+    images: ['/images/products/X300-special-red.png'],
+    stock: 5,
+    featured: false,
+    status: 'active',
+    createdAt: daysAgo(15),
+    colors: [
+      { name: 'Rosso', hex: '#cc2936', images: ['/images/products/X300-special-red.png'] },
+      { name: 'Arancione', hex: '#f97316', images: ['/images/products/X300-special-orange.png'] },
+      { name: 'Latte', hex: '#c8b8a2', images: ['/images/products/X300-special-latte.png'] },
+      { name: 'Nero', hex: '#1a1a1a', images: ['/images/products/X300-special-All-Black-Thumbnail.png'] },
+    ],
+    engineVariants: ['350cc'],
+    longDescription:
+      "The Lambretta G350 is the grand tourer of the range — a machine built for riders who want to go farther and arrive in style. The torquey 330cc engine produces 28.6 hp and pulls strongly from low revs, making it equally at home on motorway stretches as on twisting country roads.\n\nSculpted bodywork, premium finish panels and a long, plush seat make long-distance comfort a priority. ABS dual-disc braking, a full TFT instrument cluster and optional heated grips complete the touring package.",
+    features: [
+      'ABS Dual-Disc Braking',
+      'Full LED Lighting',
+      'TFT Instrument Cluster',
+      '330cc Torque Engine',
+      'Long-Distance Seat',
+      'Under-Seat Storage',
+      'USB-C Charging Port',
+      'Adjustable Suspension',
+      'Euro 5 Compliant',
+    ],
+  },
+  {
+    id: 'p-italjet-dragster',
+    name: 'Italjet Dragster 200',
+    slug: 'italjet-dragster-200',
+    brandId: 'b-italjet',
+    categoryId: 'c-scooter',
+    type: 'scooter',
+    price: 7299,
+    salePrice: null,
+    description:
+      'A two-wheeled supercar. The exposed trellis frame and patented front suspension make the Dragster the sharpest-handling scooter on the road.',
+    specs: { Engine: '181cc', Power: '20.5 hp', 'Top speed': '125 km/h', Weight: '125 kg', Brakes: 'Radial ABS' },
+    images: [
+      '/images/products/italiajet 200 dragster 1.webp',
+      '/images/products/italiajet 200 dragster 2.webp',
+    ],
+    heroImage: '/images/hero/italjet.png',
+    stock: 4,
+    featured: true,
+    status: 'active',
+    createdAt: daysAgo(2),
+    colors: [
+      { name: 'Carbonio Nero', hex: '#1a1a1a' },
+      { name: 'Rosso Fuoco', hex: '#cc2936' },
+      { name: 'Argento Racing', hex: '#c0c0c0' },
+    ],
+    engineVariants: ['125cc', '200cc'],
+    longDescription:
+      "A two-wheeled supercar. The Italjet Dragster's exposed trellis frame and patented front hub-centre suspension are engineering statements as much as they are functional choices — this is a scooter designed to challenge conventions and dominate every corner.\n\nThe 181cc single-cylinder engine delivers 20.5 hp through a CVT transmission optimised for snap-response throttle. Radial ABS monobloc brake callipers and 300mm discs provide stopping power that matches the Dragster's aggressive performance.",
+    features: [
+      'Radial ABS Monobloc Brakes',
+      'Exposed Trellis Frame',
+      'Hub-Centre Front Suspension',
+      'Full LED Lighting',
+      'TFT Digital Instrument Cluster',
+      'USB Charging Port',
+      'Quick-Release Seat',
+      'Adjustable Rear Monoshock',
+      'Euro 5 Compliant',
+    ],
+  },
+  {
+    id: 'p-honda-giorno',
+    name: 'Honda Giorno+',
+    slug: 'honda-giorno-plus',
+    brandId: 'b-honda',
+    categoryId: 'c-scooter',
+    type: 'scooter',
+    price: 3499,
+    salePrice: null,
+    description:
+      'Retro pastel charm meets Honda dependability. The Giorno+ is the friendliest way to glide through the city in style.',
+    specs: { Engine: '124cc eSP', Power: '8.8 hp', 'Top speed': '85 km/h', Weight: '95 kg', Brakes: 'CBS front disc' },
+    images: ['/images/products/Honda Giorno red.png'],
+    stock: 22,
+    featured: true,
+    status: 'active',
+    createdAt: daysAgo(7),
+    colors: [
+      { name: 'Rosso', hex: '#cc2936', images: ['/images/products/Honda Giorno red.png'] },
+      { name: 'Beige', hex: '#c8b8a2', images: ['/images/products/Honda Giorno biege.png'] },
+      { name: 'Verde', hex: '#4FB286', images: ['/images/products/Honda Giorno green.png'] },
+      { name: 'Bianco', hex: '#f5f0e8', images: ['/images/products/Honda Giorno white.png'] },
+      { name: 'Giallo', hex: '#f4d03f', images: ['/images/products/Honda Giorno yellow.png'] },
+    ],
+    engineVariants: ['50cc', '125cc'],
+    longDescription:
+      "Retro pastel charm meets Honda dependability. The Giorno+ carries the spirit of the classic 1992 Honda Giorno into the present — same charming proportions, same approachable step-through layout, but now powered by a modern 124cc eSP engine with Honda's legendary fuel efficiency and reliability.\n\nAt just 95 kg it's one of the lightest scooters in its class, making it genuinely easy to handle for riders of all experience levels. The Giorno+ is the friendliest, most characterful way to glide through the city in style.",
+    features: [
+      'CBS Front Disc Brake',
+      'Full LED Lighting',
+      'eSP Engine Technology',
+      'Step-Through Frame',
+      'Under-Seat Storage',
+      'USB Charging Port',
+      'Lightweight 95 kg',
+      'Retro Chrome Accents',
+      'Euro 5 Compliant',
+    ],
+  },
+
+  // ── Parts ─────────────────────────────────────────────────
+  {
+    id: 'p-part-exhaust',
+    name: 'Akra Sport Exhaust — Vespa',
+    slug: 'akra-sport-exhaust-vespa',
+    brandId: 'b-vespa',
+    categoryId: 'c-part',
+    type: 'part',
+    price: 389,
+    salePrice: null,
+    description:
+      'Hand-finished stainless performance exhaust. Adds top-end power and a deeper, sportier note. Bolt-on fit for GTS/GTV.',
+    specs: { Material: 'Stainless steel', Fitment: 'Vespa GTS/GTV 300', Gain: '+1.8 hp' },
+    images: [
+      '/images/products/akrapovic 1.png',
+      '/images/products/akrapovic 2.png',
+    ],
+    stock: 30,
+    featured: false,
+    status: 'active',
+    createdAt: daysAgo(25),
+  },
+  {
+    id: 'p-part-exhaust-lambretta',
+    name: 'Akra Sport Exhaust — Lambretta',
+    slug: 'akra-sport-exhaust-lambretta',
+    brandId: 'b-lambretta',
+    categoryId: 'c-part',
+    type: 'part',
+    price: 389,
+    salePrice: null,
+    description:
+      'Hand-finished stainless performance exhaust. Adds top-end power and a deeper, sportier note. Bolt-on fit for Lambretta V-series and G-series.',
+    specs: { Material: 'Stainless steel', Fitment: 'Lambretta V200 / G350', Gain: '+1.6 hp' },
+    images: [
+      '/images/products/akrapovic 1.png',
+      '/images/products/akrapovic 2.png',
+    ],
+    stock: 20,
+    featured: false,
+    status: 'active',
+    createdAt: daysAgo(26),
+  },
+  {
+    id: 'p-part-exhaust-italjet',
+    name: 'Akra Sport Exhaust — Italjet',
+    slug: 'akra-sport-exhaust-italjet',
+    brandId: 'b-italjet',
+    categoryId: 'c-part',
+    type: 'part',
+    price: 419,
+    salePrice: null,
+    description:
+      'Hand-finished stainless performance exhaust tuned for the Dragster platform. Freer breathing, sharper throttle response and an unmistakable race-derived sound.',
+    specs: { Material: 'Stainless steel', Fitment: 'Italjet Dragster 125 / 200', Gain: '+2.1 hp' },
+    images: [
+      '/images/products/akrapovic 1.png',
+      '/images/products/akrapovic 2.png',
+    ],
+    stock: 15,
+    featured: false,
+    status: 'active',
+    createdAt: daysAgo(27),
+  },
+  {
+    id: 'p-part-exhaust-honda',
+    name: 'Akra Sport Exhaust — Honda',
+    slug: 'akra-sport-exhaust-honda',
+    brandId: 'b-honda',
+    categoryId: 'c-part',
+    type: 'part',
+    price: 359,
+    salePrice: null,
+    description:
+      "Hand-finished stainless performance exhaust. A direct bolt-on replacement that brings out the best in the Giorno's engine while keeping the classic silhouette.",
+    specs: { Material: 'Stainless steel', Fitment: 'Honda Giorno 110', Gain: '+1.4 hp' },
+    images: [
+      '/images/products/akrapovic 1.png',
+      '/images/products/akrapovic 2.png',
+    ],
+    stock: 18,
+    featured: false,
+    status: 'active',
+    createdAt: daysAgo(28),
+  },
+  {
+    id: 'p-part-brembo-vespa',
+    name: 'Brembo Toothless II — Vespa',
+    slug: 'brembo-toothless-ii-vespa',
+    brandId: 'b-vespa',
+    categoryId: 'c-part',
+    type: 'part',
+    price: 279,
+    salePrice: null,
+    description:
+      "Brembo's Toothless II floating disc brings track-grade braking to your Vespa. Improved heat dissipation and fade resistance, with a clean aesthetic that matches OEM calipers.",
+    specs: { Type: 'Floating disc', Fitment: 'Vespa GTS / GTV 300', Material: 'Cast iron + aluminium carrier' },
+    images: [
+      '/images/products/brembo brake.png',
+      '/images/products/brembo brake kit.png',
+    ],
+    stock: 20,
+    featured: false,
+    status: 'active',
+    createdAt: daysAgo(28),
+  },
+  {
+    id: 'p-part-brembo-lambretta',
+    name: 'Brembo Toothless II — Lambretta',
+    slug: 'brembo-toothless-ii-lambretta',
+    brandId: 'b-lambretta',
+    categoryId: 'c-part',
+    type: 'part',
+    price: 279,
+    salePrice: null,
+    description:
+      "Brembo's Toothless II floating disc brings track-grade braking to your Lambretta. Improved heat dissipation and fade resistance, with a clean aesthetic that matches OEM calipers.",
+    specs: { Type: 'Floating disc', Fitment: 'Lambretta V-series / G350', Material: 'Cast iron + aluminium carrier' },
+    images: [
+      '/images/products/brembo brake.png',
+      '/images/products/brembo brake kit.png',
+    ],
+    stock: 18,
+    featured: false,
+    status: 'active',
+    createdAt: daysAgo(29),
+  },
+  {
+    id: 'p-part-brembo-italjet',
+    name: 'Brembo Toothless II — Italjet',
+    slug: 'brembo-toothless-ii-italjet',
+    brandId: 'b-italjet',
+    categoryId: 'c-part',
+    type: 'part',
+    price: 279,
+    salePrice: null,
+    description:
+      "Brembo's Toothless II floating disc brings track-grade braking to your Italjet Dragster. Maximum stopping power with improved fade resistance at high temperatures.",
+    specs: { Type: 'Floating disc', Fitment: 'Italjet Dragster 125 / 200', Material: 'Cast iron + aluminium carrier' },
+    images: [
+      '/images/products/brembo brake.png',
+      '/images/products/brembo brake kit.png',
+    ],
+    stock: 15,
+    featured: false,
+    status: 'active',
+    createdAt: daysAgo(30),
+  },
+  {
+    id: 'p-part-brembo-honda',
+    name: 'Brembo Toothless II — Honda',
+    slug: 'brembo-toothless-ii-honda',
+    brandId: 'b-honda',
+    categoryId: 'c-part',
+    type: 'part',
+    price: 259,
+    salePrice: null,
+    description:
+      "Brembo's Toothless II floating disc brings track-grade braking to your Honda Giorno. Direct fitment, improved stopping power, and a sleek floating disc aesthetic.",
+    specs: { Type: 'Floating disc', Fitment: 'Honda Giorno 110', Material: 'Cast iron + aluminium carrier' },
+    images: [
+      '/images/products/brembo brake.png',
+      '/images/products/brembo brake kit.png',
+    ],
+    stock: 22,
+    featured: false,
+    status: 'active',
+    createdAt: daysAgo(31),
+  },
+  {
+    id: 'p-part-airfilter-vespa',
+    name: 'Uno Minda Air Filter — Vespa',
+    slug: 'uno-minda-air-filter-vespa',
+    brandId: 'b-vespa',
+    categoryId: 'c-part',
+    type: 'part',
+    price: 129,
+    salePrice: 99,
+    description:
+      'High-flow washable performance filter. Improves throttle response and is reusable for the life of the scooter. Direct fitment for Vespa GTS/GTV/Primavera/Sprint.',
+    specs: { Model: 'AF2101PM', Type: 'Washable cotton', Fitment: 'Vespa GTS / Primavera / Sprint', Reusable: 'Yes' },
+    images: ['/images/products/Uno Minda AF2101PM Engine Air Filter.png'],
+    colors: [
+      { name: 'Standard', hex: '#c8a86b', images: ['/images/products/Uno Minda AF2101PM Engine Air Filter.png'] },
+      { name: 'Green', hex: '#4a7c59', images: ['/images/products/Uno Minda AF2101PM Engine Air Filter green.png'] },
+    ],
+    stock: 40,
+    featured: false,
+    status: 'active',
+    createdAt: daysAgo(30),
+  },
+  {
+    id: 'p-part-airfilter-lambretta',
+    name: 'Uno Minda Air Filter — Lambretta',
+    slug: 'uno-minda-air-filter-lambretta',
+    brandId: 'b-lambretta',
+    categoryId: 'c-part',
+    type: 'part',
+    price: 129,
+    salePrice: 99,
+    description:
+      'High-flow washable performance filter. Improves throttle response and is reusable for the life of the scooter. Direct fitment for Lambretta V-series and G350.',
+    specs: { Model: 'AF2101PM', Type: 'Washable cotton', Fitment: 'Lambretta V200 / G350', Reusable: 'Yes' },
+    images: ['/images/products/Uno Minda AF2101PM Engine Air Filter.png'],
+    colors: [
+      { name: 'Standard', hex: '#c8a86b', images: ['/images/products/Uno Minda AF2101PM Engine Air Filter.png'] },
+      { name: 'Green', hex: '#4a7c59', images: ['/images/products/Uno Minda AF2101PM Engine Air Filter green.png'] },
+    ],
+    stock: 35,
+    featured: false,
+    status: 'active',
+    createdAt: daysAgo(31),
+  },
+  {
+    id: 'p-part-airfilter-italjet',
+    name: 'Uno Minda Air Filter — Italjet',
+    slug: 'uno-minda-air-filter-italjet',
+    brandId: 'b-italjet',
+    categoryId: 'c-part',
+    type: 'part',
+    price: 129,
+    salePrice: 99,
+    description:
+      'High-flow washable performance filter. Improves throttle response and is reusable for the life of the scooter. Direct fitment for the Italjet Dragster 125 and 200.',
+    specs: { Model: 'AF2101PM', Type: 'Washable cotton', Fitment: 'Italjet Dragster 125 / 200', Reusable: 'Yes' },
+    images: ['/images/products/Uno Minda AF2101PM Engine Air Filter.png'],
+    colors: [
+      { name: 'Standard', hex: '#c8a86b', images: ['/images/products/Uno Minda AF2101PM Engine Air Filter.png'] },
+      { name: 'Green', hex: '#4a7c59', images: ['/images/products/Uno Minda AF2101PM Engine Air Filter green.png'] },
+    ],
+    stock: 30,
+    featured: false,
+    status: 'active',
+    createdAt: daysAgo(32),
+  },
+  {
+    id: 'p-part-airfilter-honda',
+    name: 'Uno Minda Air Filter — Honda',
+    slug: 'uno-minda-air-filter-honda',
+    brandId: 'b-honda',
+    categoryId: 'c-part',
+    type: 'part',
+    price: 119,
+    salePrice: 89,
+    description:
+      'High-flow washable performance filter. Improves throttle response and is reusable for the life of the scooter. Direct fitment for the Honda Giorno 110.',
+    specs: { Model: 'AF2101PM', Type: 'Washable cotton', Fitment: 'Honda Giorno 110', Reusable: 'Yes' },
+    images: ['/images/products/Uno Minda AF2101PM Engine Air Filter.png'],
+    colors: [
+      { name: 'Standard', hex: '#c8a86b', images: ['/images/products/Uno Minda AF2101PM Engine Air Filter.png'] },
+      { name: 'Green', hex: '#4a7c59', images: ['/images/products/Uno Minda AF2101PM Engine Air Filter green.png'] },
+    ],
+    stock: 45,
+    featured: false,
+    status: 'active',
+    createdAt: daysAgo(33),
+  },
+
+  // ── Accessories / Helmets ─────────────────────────────────
+  {
+    id: 'p-shoei-glamster',
+    name: 'Shoei Glamster Helmet',
+    slug: 'shoei-x14-marquez',
+    brandId: 'b-shoei',
+    categoryId: 'c-accessory',
+    type: 'accessory',
+    price: 649,
+    salePrice: null,
+    description:
+      'Retro style, modern soul. The Shoei Glamster pairs a classic café-racer silhouette with a premium AIM+ shell and the internal sun visor system Shoei is famous for.',
+    specs: { Shell: 'AIM+', Weight: '1,395 g', Safety: 'SNELL M2020D / ECE 22.06', Visor: 'Pinlock EVO lens + sun visor', Ventilation: '7 intakes' },
+    images: ['/images/products/shoei glamster black 1.webp'],
+    colors: [
+      {
+        name: 'Matte Black',
+        hex: '#1a1a1a',
+        images: [
+          '/images/products/shoei glamster black 1.webp',
+          '/images/products/shoei glamster black 2.webp',
+          '/images/products/shoei glamster black 3.webp',
+          '/images/products/shoei glamster black 4.webp',
+        ],
+      },
+      {
+        name: 'Pearl White',
+        hex: '#f0f0f0',
+        images: [
+          '/images/products/shoei glamster white 1.webp',
+          '/images/products/shoei glamster white 2.webp',
+          '/images/products/shoei glamster white 3.webp',
+        ],
+      },
+    ],
+    stock: 8,
+    featured: true,
+    status: 'active',
+    createdAt: daysAgo(3),
+  },
+  {
+    id: 'p-shoei-vfx-evo',
+    name: 'Shoei VFX-EVO Helmet',
+    slug: 'shoei-vfx-evo',
+    brandId: 'b-shoei',
+    categoryId: 'c-accessory',
+    type: 'accessory',
+    price: 729,
+    salePrice: null,
+    description:
+      'The off-road benchmark from Shoei. The VFX-EVO dominates motocross and enduro courses with a multi-ply matrix shell, aggressive ventilation and a wide field of vision.',
+    specs: { Shell: 'Multi-ply matrix', Weight: '1,085 g', Safety: 'SNELL M2020D', Visor: 'Wide-angle sun shield', Ventilation: 'Full MX ventilation' },
+    images: ['/images/products/SHOEI VFX-EVO 1.jpg'],
+    stock: 5,
+    featured: false,
+    status: 'active',
+    createdAt: daysAgo(6),
+  },
+  {
+    id: 'p-arai-rx7v',
+    name: 'Arai Ram-X Helmet',
+    slug: 'arai-rx7v-evo',
+    brandId: 'b-arai',
+    categoryId: 'c-accessory',
+    type: 'accessory',
+    price: 749,
+    salePrice: null,
+    description:
+      "Hand-built in Japan to standards that exceed every regulation. The Ram-X's round shell deflects impacts rather than absorbing them, delivering unmatched protection for serious riders.",
+    specs: { Shell: 'PB-SNC2', Weight: '1,430 g', Safety: 'ECE 22.06 / SNELL', Visor: 'VAS-V Pro Shield', Ventilation: 'Full-face VAS system' },
+    images: ['/images/products/Arai Helmets - Ram-X Helmet - Diamond White 1.webp'],
+    colors: [
+      {
+        name: 'Diamond White',
+        hex: '#efefef',
+        images: [
+          '/images/products/Arai Helmets - Ram-X Helmet - Diamond White 1.webp',
+          '/images/products/Arai Helmets - Ram-X Helmet - Diamond White 2.webp',
+        ],
+      },
+      {
+        name: 'Fluorescent Yellow',
+        hex: '#ccff00',
+        images: [
+          '/images/products/Arai Helmets - Ram-X Helmet - Fluorescent Yellow 1.webp',
+          '/images/products/Arai Helmets - Ram-X Helmet - Fluorescent Yellow 2.webp',
+          '/images/products/Arai Helmets - Ram-X Helmet - Fluorescent Yellow 3.webp',
+          '/images/products/Arai Helmets - Ram-X Helmet - Fluorescent Yellow 4.webp',
+        ],
+      },
+    ],
+    stock: 6,
+    featured: false,
+    status: 'active',
+    createdAt: daysAgo(5),
+  },
+  {
+    id: 'p-hjc-rpha11',
+    name: 'HJC RPHA 12N Helmet',
+    slug: 'hjc-rpha-11-pro',
+    brandId: 'b-hjc',
+    categoryId: 'c-accessory',
+    type: 'accessory',
+    price: 429,
+    salePrice: null,
+    description:
+      'The RPHA 12N puts MotoGP-level safety within reach. A premium carbon-composite shell, aggressive aerodynamics and a wide eyeport make it the benchmark in its class.',
+    specs: { Shell: 'P.I.M.F Carbon', Weight: '1,250 g', Safety: 'ECE 22.06 / DOT', Visor: 'Pinlock 120 ready', Ventilation: '7 intakes + 4 exhausts' },
+    images: [
+      '/images/products/hjc helmet RPHA 12N 1.webp',
+      '/images/products/hjc helmet RPHA 12N 2.webp',
+      '/images/products/hjc helmet RPHA 12N 3.webp',
+      '/images/products/hjc helmet RPHA 12N 4.webp',
+    ],
+    stock: 15,
+    featured: false,
+    status: 'active',
+    createdAt: daysAgo(8),
+  },
+  {
+    id: 'p-agv-k6s',
+    name: 'AGU Pista GP RR Helmet',
+    slug: 'agv-k6-s',
+    brandId: 'b-agv',
+    categoryId: 'c-accessory',
+    type: 'accessory',
+    price: 489,
+    salePrice: 449,
+    description:
+      'The Pista GP RR is the most aerodynamically refined road helmet available — ultra-compact, wickedly ventilated and built from a matte carbon shell engineered for maximum performance.',
+    specs: { Shell: 'Mono Matt Carbon', Weight: '1,270 g', Safety: 'ECE 22.06 / DOT', Visor: 'Pinlock 120 Max Vision', Ventilation: '4 intakes + 2 exhausts' },
+    images: [
+      '/images/products/agu helmet PISTA GP RR MONO MATT CARBON 1.webp',
+      '/images/products/agu helmet PISTA GP RR MONO MATT CARBON 2.webp',
+      '/images/products/agu helmet PISTA GP RR MONO MATT CARBON 3.webp',
+      '/images/products/agu helmet PISTA GP RR MONO MATT CARBON 4.webp',
+    ],
+    stock: 12,
+    featured: true,
+    status: 'active',
+    createdAt: daysAgo(1),
+  },
+  {
+    id: 'p-bell-race-star',
+    name: 'Bell Eliminator Helmet',
+    slug: 'bell-race-star-flex-dlx',
+    brandId: 'b-bell',
+    categoryId: 'c-accessory',
+    type: 'accessory',
+    price: 549,
+    salePrice: null,
+    description:
+      'American innovation at its finest. The Bell Eliminator is a retro-sport full-face helmet with a carbon fibre shell option, aggressively styled yet loaded with modern safety technology.',
+    specs: { Shell: 'Carbon composite', Weight: '1,310 g', Safety: 'ECE 22.06 / SNELL M2020', Visor: 'PhotoChromic lens ready', Ventilation: 'Aero-vac vent system' },
+    images: ['/images/products/bell helmet eliminator 1.webp'],
+    colors: [
+      {
+        name: 'Standard',
+        hex: '#1a1a2e',
+        images: [
+          '/images/products/bell helmet eliminator 1.webp',
+          '/images/products/bell helmet eliminator 2.webp',
+          '/images/products/bell helmet eliminator 3.webp',
+          '/images/products/bell helmet eliminator 4.webp',
+          '/images/products/bell helmet eliminator 5.webp',
+        ],
+      },
+      {
+        name: 'Carbon',
+        hex: '#2d2d2d',
+        images: [
+          '/images/products/bell helmet eliminator carbon 1.webp',
+          '/images/products/bell helmet eliminator carbon 2.webp',
+          '/images/products/bell helmet eliminator carbon 3.webp',
+          '/images/products/bell helmet eliminator carbon 4.webp',
+        ],
+      },
+    ],
+    stock: 9,
+    featured: false,
+    status: 'active',
+    createdAt: daysAgo(10),
+  },
+  {
+    id: 'p-bell-lithium',
+    name: 'Bell Lithium Helmet',
+    slug: 'bell-lithium',
+    brandId: 'b-bell',
+    categoryId: 'c-accessory',
+    type: 'accessory',
+    price: 699,
+    salePrice: null,
+    description:
+      "Bell's flagship road helmet. The Lithium pairs a hand-laid carbon shell with a Flex Impact Liner and the widest optical field of any Bell full-face — an undeniable step up for serious riders.",
+    specs: { Shell: 'Carbon fibre', Weight: '1,190 g', Safety: 'ECE 22.06 / SNELL M2020', Visor: 'Photochromic ProVision', Ventilation: '5 intakes + 4 exhausts' },
+    images: [
+      '/images/products/bell helmet lithium 1.webp',
+      '/images/products/bell helmet lithium 2.webp',
+      '/images/products/bell helmet lithium 3.webp',
+      '/images/products/bell helmet lithium 4.webp',
+    ],
+    stock: 5,
+    featured: false,
+    status: 'active',
+    createdAt: daysAgo(7),
+  },
+  {
+    id: 'p-hjc-respon',
+    name: 'HJC RESPON Helmet',
+    slug: 'hjc-respon',
+    brandId: 'b-hjc',
+    categoryId: 'c-accessory',
+    type: 'accessory',
+    price: 349,
+    salePrice: null,
+    description:
+      'The RESPON is HJC at its most refined — a lightweight polycarbonate-composite shell, integrated sun visor and a snug fit for all-day touring comfort without sacrificing safety.',
+    specs: { Shell: 'Polycarbonate-composite', Weight: '1,350 g', Safety: 'ECE 22.06', Visor: 'Pinlock 30 ready + sun visor', Ventilation: '4 intakes + 2 exhausts' },
+    images: [
+      '/images/products/hjc helmet RESPON 1.webp',
+      '/images/products/hjc helmet RESPON 2.webp',
+      '/images/products/hjc helmet RESPON 3.webp',
+    ],
+    stock: 11,
+    featured: false,
+    status: 'active',
+    createdAt: daysAgo(15),
+  },
+
+  // ── Tires ─────────────────────────────────────────────────
+  {
+    id: 'p-pirelli-angel-gt',
+    name: 'Pirelli Angel GT II Tire Set',
+    slug: 'pirelli-angel-gt-ii',
+    brandId: 'b-pirelli',
+    categoryId: 'c-part',
+    type: 'part',
+    price: 239,
+    salePrice: null,
+    description:
+      "Grand touring performance with all-season confidence. The Angel GT II delivers Pirelli's sport-touring expertise in a compound optimised for mileage, wet grip and stability on long rides.",
+    specs: { Type: 'Sport touring', Front: '120/70-ZR17', Rear: '180/55-ZR17', 'Wet grip': 'Class A', Compound: 'Dual compound' },
+    images: [
+      '/images/products/pirelli angel 1.png',
+      '/images/products/pirelli angel 2.png',
+      '/images/products/pirelli angel 3.png',
+    ],
+    stock: 25,
+    featured: false,
+    status: 'active',
+    createdAt: daysAgo(16),
+  },
+  {
+    id: 'p-pirelli-diablo-rosso',
+    name: 'Pirelli Diablo Rosso Tire Set',
+    slug: 'pirelli-diablo-rosso',
+    brandId: 'b-pirelli',
+    categoryId: 'c-part',
+    type: 'part',
+    price: 279,
+    salePrice: null,
+    description:
+      "Born on the track, built for the street. The Diablo Rosso delivers razor-sharp cornering feel and maximum lean-angle grip — the choice of riders who push the limits on every ride.",
+    specs: { Type: 'Sport / track-day', Front: '120/70-ZR17', Rear: '180/55-ZR17', 'Wet grip': 'Class B', Compound: 'SC1 sport compound' },
+    images: [
+      '/images/products/pirelli diablo rosso 1.png',
+      '/images/products/pirelli diablo rosso 2.png',
+      '/images/products/pirelli diablo rosso 3.png',
+    ],
+    stock: 18,
+    featured: false,
+    status: 'active',
+    createdAt: daysAgo(14),
+  },
+  {
+    id: 'p-michelin-city-grip2',
+    name: 'Michelin City Grip Saver Tire Set',
+    slug: 'michelin-city-grip-2',
+    brandId: 'b-michelin',
+    categoryId: 'c-part',
+    type: 'part',
+    price: 189,
+    salePrice: null,
+    description:
+      "The urban grip specialist. Michelin's City Grip Saver formula excels on wet cobblestones and road markings — the most treacherous surfaces a city rider faces — with a tread pattern engineered for scooter geometry.",
+    specs: { Type: 'Urban / scooter', Front: '110/70-12', Rear: '130/70-12', 'Wet grip': 'Class A', Compound: 'Silica compound' },
+    images: [
+      '/images/products/Michelin city grip saver 1.webp',
+      '/images/products/Michelin city grip saver 2.webp',
+      '/images/products/Michelin city grip saver 3.webp',
+      '/images/products/Michelin city grip saver 4.webp',
+    ],
+    stock: 30,
+    featured: false,
+    status: 'active',
+    createdAt: daysAgo(19),
+  },
+  {
+    id: 'p-michelin-power-shift',
+    name: 'Michelin Power Shift Tire Set',
+    slug: 'michelin-power-shift',
+    brandId: 'b-michelin',
+    categoryId: 'c-part',
+    type: 'part',
+    price: 229,
+    salePrice: null,
+    description:
+      "Maximum sport performance for spirited riding. The Michelin Power Shift pairs aggressive cornering geometry with a high-silica compound that heats up fast and delivers consistent lap-to-lap grip.",
+    specs: { Type: 'Sport / performance', Front: '120/70-ZR17', Rear: '160/60-ZR17', 'Wet grip': 'Class A', Compound: 'High-silica sport' },
+    images: [
+      '/images/products/Michelin power shift 1.webp',
+      '/images/products/Michelin power shift 2.webp',
+      '/images/products/Michelin power shift 3.webp',
+      '/images/products/Michelin power shift 4.webp',
+    ],
+    stock: 22,
+    featured: false,
+    status: 'active',
+    createdAt: daysAgo(17),
+  },
+]
+
+function seed(): FullProduct[] {
+  const list = SEED_PRODUCTS.map((p) => ({ ...p }))
+  saveFullProducts(list)
+  localStorage.setItem(VER_KEY, String(DATA_VER))
+  return list
+}
+
+export function getFullProducts(): FullProduct[] {
+  // If stored data is from an older schema version, re-seed so images show up.
+  const ver = parseInt(localStorage.getItem(VER_KEY) ?? '0', 10)
+  if (ver < DATA_VER) return seed()
+
+  const raw = localStorage.getItem(KEY)
+  if (!raw) return seed()
+
+  try {
+    const list = JSON.parse(raw) as FullProduct[]
+    // Verify the first scooter has images — catches empty-array corruption.
+    const firstScooter = list.find((p) => p.type === 'scooter')
+    if (!Array.isArray(list) || !firstScooter || !firstScooter.images?.length) {
+      return seed()
+    }
+    return list
+  } catch {
+    return seed()
+  }
+}
+
+export function saveFullProducts(list: FullProduct[]): void {
+  localStorage.setItem(KEY, JSON.stringify(list))
+  localStorage.setItem(VER_KEY, String(DATA_VER))
+}
+
+export function resetFullProducts(): FullProduct[] {
+  const seed = SEED_PRODUCTS.map((p) => ({ ...p }))
+  saveFullProducts(seed)
+  return seed
+}
+
+export function getFullProductById(id: string): FullProduct | undefined {
+  return getFullProducts().find((p) => p.id === id)
+}
+
+export function upsertFullProduct(product: FullProduct): void {
+  const list = getFullProducts()
+  const idx = list.findIndex((p) => p.id === product.id)
+  if (idx >= 0) list[idx] = product
+  else list.unshift(product)
+  saveFullProducts(list)
+}
+
+export function deleteFullProduct(id: string): void {
+  saveFullProducts(getFullProducts().filter((p) => p.id !== id))
+}
+
+export const BRANDS = [
+  { id: 'b-vespa', name: 'Vespa' },
+  { id: 'b-lambretta', name: 'Lambretta' },
+  { id: 'b-italjet', name: 'Italjet' },
+  { id: 'b-honda', name: 'Honda' },
+  { id: 'b-shoei', name: 'Shoei' },
+  { id: 'b-arai', name: 'Arai' },
+  { id: 'b-hjc', name: 'HJC' },
+  { id: 'b-agv', name: 'AGV' },
+  { id: 'b-bell', name: 'Bell' },
+  { id: 'b-pirelli', name: 'Pirelli' },
+  { id: 'b-michelin', name: 'Michelin' },
+]
+
+export const CATEGORY_MAP: Record<FullProduct['type'], string> = {
+  scooter: 'c-scooter',
+  part: 'c-part',
+  accessory: 'c-accessory',
+}

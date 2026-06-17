@@ -20,7 +20,7 @@ export default function Favorites() {
 
   if (favorites.length === 0) {
     return (
-      <div className="mx-auto flex min-h-[80vh] max-w-2xl flex-col items-center justify-center px-5 pt-28 text-center">
+      <div className="mx-auto flex min-h-[80vh] max-w-2xl flex-col items-center justify-center px-5 pt-32 text-center">
         <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-paper-soft">
           <Heart size={36} className="text-coal-dim" />
         </div>

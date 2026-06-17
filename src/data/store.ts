@@ -44,6 +44,18 @@ export async function getProducts(): Promise<Product[]> {
     if (error) throw error
     return data as Product[]
   }
+  // Check admin-managed products first (admin writes to this key)
+  const stored = localStorage.getItem('velocita_products')
+  if (stored) {
+    try {
+      const list = JSON.parse(stored) as Product[]
+      if (Array.isArray(list) && list.length > 0) {
+        return list
+          .filter((p) => p.status === 'active')
+          .map((p) => ({ ...p, images: Array.isArray(p.images) ? p.images : [] }))
+      }
+    } catch {}
+  }
   await delay()
   return seedProducts.filter((p) => p.status === 'active')
 }
@@ -58,6 +70,16 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
     const { data, error } = await supabase.from('products').select('*').eq('slug', slug).single()
     if (error) return null
     return data as Product
+  }
+  const stored = localStorage.getItem('velocita_products')
+  if (stored) {
+    try {
+      const list = JSON.parse(stored) as Product[]
+      if (Array.isArray(list)) {
+        const found = list.find((p) => p.slug === slug) ?? null
+        if (found) return { ...found, images: Array.isArray(found.images) ? found.images : [] }
+      }
+    } catch {}
   }
   await delay()
   return seedProducts.find((p) => p.slug === slug) ?? null

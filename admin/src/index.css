@@ -1,0 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { box-sizing: border-box; }
+body { margin: 0; background: #F8F9FA; }
+
+.scroll-hover { scrollbar-gutter: stable; scrollbar-width: thin; scrollbar-color: transparent transparent; }
+.scroll-hover::-webkit-scrollbar { width: 4px; }
+.scroll-hover::-webkit-scrollbar-track { background: transparent; }
+.scroll-hover::-webkit-scrollbar-thumb { background: transparent; border-radius: 9999px; transition: background 0.2s; }
+.scroll-hover:hover { scrollbar-color: #CBD5E1 transparent; }
+.scroll-hover:hover::-webkit-scrollbar-thumb { background: #CBD5E1; }

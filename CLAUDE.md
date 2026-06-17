@@ -91,12 +91,12 @@ When a scooter brand tab is selected (e.g. Vespa), accessories/helmets/tires fro
 - Navbar heart icon fills orange (`fill-carrot`) when any favorites exist — no badge count
 - `/favorites` route shows saved items grid
 
-### Testimonials (Home.tsx)
-- Full-width gray background band (`bg-[#F0F0F0]`)
-- Cards: `bg-white` with `style={{ borderRadius: '80px 80px 20px 20px' }}`
-- Text block: `min-h-[5.75rem] line-clamp-4` (uniform 4-line height)
-- Quote icon: Lucide `Quote` component
-- Arrows at bottom center, same style as FleetCarousel arrows
+### Testimonials (Home.tsx) — "Editorial Spotlight"
+- Full-width dark band (`#0E0E12`), matching the "How it works" section
+- One testimonial shown at a time: large rider portrait (rounded `28px`, `4/5` aspect) on the left, pull-quote on the right
+- Pull-quote in `font-display` `text-2xl` white; orange filled Lucide `Quote` icon above it; 5 carrot stars; name + `tag` sub-label (e.g. "Vespa GTS owner")
+- Navigation: avatar rail centered at bottom (active avatar gets `ring-carrot`) flanked by prev/next arrows
+- Each testimonial has a `tag` field — a short descriptor derived from its review text
 
 ## Routes
 
@@ -117,6 +117,4 @@ Five Metro Manila branches: Pasig, Makati, BGC, Quezon City, Mandaluyong.
 ## What NOT to Do
 
 - Don't add a badge count to the favorites heart in the navbar (user explicitly does not want it)
-- Don't change the testimonial card shape (`borderRadius: '80px 80px 20px 20px'`) — only the background color (`bg-white`) was changed
-- Don't replace the Lucide `Quote` icon with a typographic `"` character
 - Don't show the pickup branch select on non-scooter products

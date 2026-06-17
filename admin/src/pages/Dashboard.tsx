@@ -3,13 +3,13 @@ import { useNavigate } from 'react-router-dom'
 import { Eye, ArrowUpRight, ArrowDownRight, ShoppingCart, Package, Star, MessageSquare } from 'lucide-react'
 import { PiCubeBold, PiReceiptBold, PiCurrencyDollarBold, PiHourglassMediumBold } from 'react-icons/pi'
 import {
-  AreaChart, Area, PieChart, Pie, Cell, BarChart, Bar,
+  AreaChart, Area, PieChart, Pie, Cell, Sector, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts'
 import { geoMercator, geoPath } from 'd3-geo'
 import type { Feature, FeatureCollection } from 'geojson'
 import { getOrders, type AdminOrder } from '../data/orders'
-import { products } from '../data/products'
+import { getFullProducts } from '../data/fullProducts'
 import { formatPrice } from '../lib/format'
 
 type StatusKey = AdminOrder['status']
@@ -21,6 +21,14 @@ const STATUS_HEX: Record<StatusKey, string> = {
   completed: '#10B981',
   cancelled: '#EF4444',
 }
+const DONUT_HEX: Record<StatusKey, string> = {
+  completed:  '#F95D0E',
+  processing: '#D94E08',
+  pending:    '#FB8040',
+  ready:      '#FDAD84',
+  cancelled:  '#FDD3B9',
+}
+
 const STATUS_COLORS: Record<StatusKey, string> = {
   pending: 'bg-amber-100 text-amber-700',
   processing: 'bg-blue-100 text-blue-700',
@@ -315,6 +323,72 @@ function PesoTooltip({ active, payload, label }: { active?: boolean; payload?: {
   )
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function renderActiveShape(props: any) {
+  const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props
+  return (
+    <g>
+      <Sector cx={cx} cy={cy} innerRadius={innerRadius} outerRadius={outerRadius + 20}
+        startAngle={startAngle} endAngle={endAngle} fill={fill} />
+    </g>
+  )
+}
+
+function OrderStatusDonut({ data, total }: { data: { name: string; value: number; color: string }[]; total: number }) {
+  const [activeIdx, setActiveIdx] = useState<number | null>(null)
+  const active = activeIdx !== null ? data[activeIdx] : null
+
+  return (
+    <>
+      <div className="flex-1 flex items-center justify-center min-h-0 py-2">
+        <div className="w-4/5 mx-auto relative" style={{ aspectRatio: '1' }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                activeIndex={activeIdx ?? undefined}
+                activeShape={renderActiveShape}
+                data={data}
+                cx="50%" cy="50%"
+                innerRadius="50%" outerRadius="68%"
+                paddingAngle={0} dataKey="value"
+                onMouseEnter={(_, index) => setActiveIdx(index)}
+                onMouseLeave={() => setActiveIdx(null)}
+                animationBegin={0} animationDuration={800}
+              >
+                {data.map((e) => <Cell key={e.name} fill={e.color} stroke="transparent" />)}
+              </Pie>
+            </PieChart>
+          </ResponsiveContainer>
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none">
+            {active ? (
+              <>
+                <span className="text-xl font-bold text-coal leading-tight">{active.value}</span>
+                <span className="text-[10px] text-coal-muted font-medium capitalize mt-0.5">{active.name}</span>
+              </>
+            ) : (
+              <>
+                <span className="text-2xl font-bold text-coal">{total}</span>
+                <span className="text-[9px] text-coal-muted font-semibold uppercase tracking-wide">Total</span>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+      <div className="space-y-1.5 shrink-0">
+        {data.map((s) => (
+          <div key={s.name} className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: s.color }} />
+              <span className="text-[12px] text-coal-muted">{s.name}</span>
+            </div>
+            <span className="text-[12px] font-semibold text-coal">{s.value}</span>
+          </div>
+        ))}
+      </div>
+    </>
+  )
+}
+
 function StatusBadge({ status }: { status: StatusKey }) {
   return (
     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium capitalize ${STATUS_COLORS[status]}`}>
@@ -325,10 +399,14 @@ function StatusBadge({ status }: { status: StatusKey }) {
 
 export default function Dashboard() {
   const [orders, setOrders] = useState<AdminOrder[]>([])
+  const [productCount, setProductCount] = useState(0)
   const navigate = useNavigate()
   const today = new Date().toLocaleDateString('en-PH', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
 
-  useEffect(() => { setOrders(getOrders()) }, [])
+  useEffect(() => {
+    setOrders(getOrders())
+    setProductCount(getFullProducts().length)
+  }, [])
 
   const totalRevenue = orders.reduce((s, o) => s + o.subtotal, 0) + 1988100
   const pendingCount = orders.filter((o) => o.status === 'pending' || o.status === 'processing').length
@@ -337,13 +415,13 @@ export default function Dashboard() {
     .slice(0, 5)
   const monthlyData = buildMonthly(orders)
   const statusCounts = (['pending', 'processing', 'ready', 'completed', 'cancelled'] as StatusKey[])
-    .map((s) => ({ name: s.charAt(0).toUpperCase() + s.slice(1), value: orders.filter((o) => o.status === s).length || (s === 'completed' ? 1 : 0), color: STATUS_HEX[s] }))
+    .map((s) => ({ name: s.charAt(0).toUpperCase() + s.slice(1), value: orders.filter((o) => o.status === s).length || (s === 'completed' ? 1 : 0), color: DONUT_HEX[s] }))
     .filter((d) => d.value > 0)
   const totalForDonut = statusCounts.reduce((s, d) => s + d.value, 0)
   const conversionRate = orders.length > 0 ? ((orders.filter(o => o.status === 'completed').length / orders.length) * 100).toFixed(1) : '68.0'
 
   const STATS = [
-    { label: 'Total Products', value: products.length,           icon: PiCubeBold,           iconBg: 'bg-orange-50', iconColor: 'text-carrot',    lineColor: '#F95D0E', sparkData: SPARKS.products, sparkUnit: 'products', trend: '+2',     trendUp: true,  viewTo: '/products' },
+    { label: 'Total Products', value: productCount,              icon: PiCubeBold,           iconBg: 'bg-orange-50', iconColor: 'text-carrot',    lineColor: '#F95D0E', sparkData: SPARKS.products, sparkUnit: 'products', trend: '+2',     trendUp: true,  viewTo: '/products' },
     { label: 'Total Orders',   value: orders.length,             icon: PiReceiptBold,         iconBg: 'bg-blue-50',   iconColor: 'text-blue-500',  lineColor: '#3B82F6', sparkData: SPARKS.orders,   sparkUnit: 'orders',   trend: '+12%',   trendUp: true,  viewTo: '/orders' },
     { label: 'Total Revenue',  value: formatPrice(totalRevenue), icon: PiCurrencyDollarBold,  iconBg: 'bg-green-50',  iconColor: 'text-green-500', lineColor: '#10B981', sparkData: SPARKS.revenue,  sparkUnit: '₱k',       trend: '+7.66%', trendUp: true,  viewTo: '/orders' },
     { label: 'Pending Orders', value: pendingCount,              icon: PiHourglassMediumBold, iconBg: 'bg-amber-50',  iconColor: 'text-amber-500', lineColor: '#F59E0B', sparkData: SPARKS.pending,  sparkUnit: 'pending',  trend: '-0.74%', trendUp: false, viewTo: '/orders' },
@@ -459,9 +537,9 @@ export default function Dashboard() {
             {/* Branch breakdown — fixed-width sidebar */}
             <div className="shrink-0 w-full sm:w-52 border-t sm:border-t-0 sm:border-l border-paper-line px-5 py-5 flex flex-col justify-center gap-4">
               {(() => {
-                const otherOrders = BRANCH_MARKERS.slice(4).reduce((s, b) => s + b.orders, 0)
+                const otherOrders = BRANCH_MARKERS.slice(6).reduce((s, b) => s + b.orders, 0)
                 const sidebarItems = [
-                  ...BRANCH_MARKERS.slice(0, 4),
+                  ...BRANCH_MARKERS.slice(0, 6),
                   { name: 'Other Cities', coordinates: [0, 0] as [number, number], color: '#CBD5E1', orders: otherOrders },
                 ]
                 return sidebarItems.map((b) => {
@@ -498,7 +576,7 @@ export default function Dashboard() {
           <div className="px-5 py-3.5 border-b border-paper-line shrink-0">
             <h2 className="text-[13px] font-semibold text-coal">Recent Activity</h2>
           </div>
-          <div className="divide-y divide-paper-line overflow-y-auto max-h-[260px]">
+          <div className="divide-y divide-paper-line overflow-y-auto max-h-[260px] scroll-hover">
             {RECENT_ACTIVITY.map((item, i) => (
               <div key={i} className="flex items-start gap-3 px-4 py-2.5 hover:bg-paper-soft transition-colors">
                 <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${item.color}`}>
@@ -522,7 +600,7 @@ export default function Dashboard() {
               View All →
             </button>
           </div>
-          <div className="divide-y divide-paper-line overflow-y-auto max-h-[260px]">
+          <div className="divide-y divide-paper-line overflow-y-auto max-h-[260px] scroll-hover">
             {BEST_SELLERS.map((item) => (
               <div key={item.rank} className="flex items-center gap-3 px-4 py-2.5 hover:bg-paper-soft transition-colors">
                 <span className="text-[12px] font-bold text-coal-dim w-4 flex-shrink-0">#{item.rank}</span>
@@ -549,7 +627,7 @@ export default function Dashboard() {
               View All →
             </button>
           </div>
-          <div className="divide-y divide-paper-line overflow-y-auto max-h-[260px]">
+          <div className="divide-y divide-paper-line overflow-y-auto max-h-[260px] scroll-hover">
             {TOP_CATEGORIES.map((cat, i) => (
               <div key={cat.name} className="flex items-center gap-3 px-4 py-2.5 hover:bg-paper-soft transition-colors">
                 <span className="text-[12px] font-bold text-coal-dim w-4 flex-shrink-0">{i + 1}.</span>
@@ -604,35 +682,7 @@ export default function Dashboard() {
             <h2 className="text-[13px] font-semibold text-coal">Order Status</h2>
             <p className="text-[11px] text-coal-muted mt-0.5">Breakdown by status</p>
           </div>
-          <div className="flex-1 flex items-center justify-center min-h-0 py-2">
-            <div className="relative">
-              <PieChart width={150} height={150}>
-                <Pie
-                  data={statusCounts} cx="50%" cy="50%"
-                  innerRadius={46} outerRadius={68} paddingAngle={3} dataKey="value"
-                  animationBegin={0} animationDuration={1000} animationEasing="ease-out"
-                >
-                  {statusCounts.map((e) => <Cell key={e.name} fill={e.color} stroke="transparent" />)}
-                </Pie>
-                <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid #E5E7EB', fontSize: 12 }} />
-              </PieChart>
-              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="text-2xl font-bold text-coal">{totalForDonut}</span>
-                <span className="text-[9px] text-coal-muted font-semibold uppercase tracking-wide">Total</span>
-              </div>
-            </div>
-          </div>
-          <div className="space-y-1.5 shrink-0">
-            {statusCounts.map((s) => (
-              <div key={s.name} className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: s.color }} />
-                  <span className="text-[12px] text-coal-muted">{s.name}</span>
-                </div>
-                <span className="text-[12px] font-semibold text-coal">{s.value}</span>
-              </div>
-            ))}
-          </div>
+          <OrderStatusDonut data={statusCounts} total={totalForDonut} />
         </div>
 
         {/* Recent Orders table — spans 3 columns */}

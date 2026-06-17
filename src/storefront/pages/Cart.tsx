@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   ShoppingBag,
   ArrowRight,
@@ -7,27 +7,23 @@ import {
   Plus,
   Trash2,
   MapPin,
-  Clock,
-  ChevronDown,
-  Check,
   Package,
 } from 'lucide-react'
 import { useCart } from '../../lib/cartContext'
 import { formatPrice } from '../../lib/format'
 import { BRANCHES } from '../../lib/branches'
+import BranchSelect from '../components/BranchSelect'
 
 export default function Cart() {
   const { items, removeItem, updateQty, subtotal, count } = useCart()
   const [branch, setBranch] = useState(BRANCHES[0].id)
-  const [branchOpen, setBranchOpen] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
+  const navigate = useNavigate()
 
   const hasScooter = items.some((i) => i.type === 'scooter')
-  const selectedBranch = BRANCHES.find((b) => b.id === branch)!
 
   if (items.length === 0) {
     return (
-      <div className="mx-auto flex min-h-[80vh] max-w-2xl flex-col items-center justify-center px-5 pt-28 text-center">
+      <div className="mx-auto flex min-h-[80vh] max-w-2xl flex-col items-center justify-center px-5 pt-32 text-center">
         <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-paper-soft">
           <ShoppingBag size={36} className="text-coal-dim" />
         </div>
@@ -40,27 +36,6 @@ export default function Cart() {
           className="mt-8 inline-flex items-center gap-2 rounded-pill bg-carrot px-7 py-3.5 font-bold text-white transition-all hover:bg-carrot-deep hover:shadow-glow"
         >
           Browse the collection <ArrowRight size={18} />
-        </Link>
-      </div>
-    )
-  }
-
-  if (submitted) {
-    return (
-      <div className="mx-auto flex min-h-[80vh] max-w-2xl flex-col items-center justify-center px-5 pt-28 text-center">
-        <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-green-50">
-          <Check size={36} className="text-green-600" />
-        </div>
-        <h1 className="mt-6 font-display text-3xl font-extrabold text-coal">Inquiry submitted!</h1>
-        <p className="mt-3 max-w-sm text-coal-muted">
-          Our team will reach out within 24 hours to confirm your order and arrange details
-          {hasScooter ? ` at the ${selectedBranch.name}` : ''}.
-        </p>
-        <Link
-          to="/shop"
-          className="mt-8 inline-flex items-center gap-2 rounded-pill bg-carrot px-7 py-3.5 font-bold text-white transition-all hover:bg-carrot-deep hover:shadow-glow"
-        >
-          Continue shopping <ArrowRight size={18} />
         </Link>
       </div>
     )
@@ -204,55 +179,15 @@ export default function Cart() {
               <p className="mb-3 text-xs font-bold uppercase tracking-widest text-coal-dim">
                 Pickup Branch
               </p>
-              <div className="relative">
-                <button
-                  onClick={() => setBranchOpen((o) => !o)}
-                  className="flex w-full items-center justify-between rounded-xl border border-paper-line bg-paper px-4 py-3 text-left text-sm font-semibold text-coal transition-colors hover:border-coal-dim"
-                >
-                  <span>{selectedBranch.name}</span>
-                  <ChevronDown
-                    size={15}
-                    className={`text-coal-dim transition-transform duration-200 ${branchOpen ? 'rotate-180' : ''}`}
-                  />
-                </button>
-                {branchOpen && (
-                  <div className="absolute inset-x-0 top-full z-10 mt-1 overflow-hidden rounded-xl border border-paper-line bg-paper shadow-lift">
-                    {BRANCHES.map((b) => (
-                      <button
-                        key={b.id}
-                        onClick={() => {
-                          setBranch(b.id)
-                          setBranchOpen(false)
-                        }}
-                        className="flex w-full items-center justify-between px-4 py-3 text-left text-sm transition-colors hover:bg-paper-soft"
-                      >
-                        <span
-                          className={`font-semibold ${branch === b.id ? 'text-carrot' : 'text-coal'}`}
-                        >
-                          {b.name}
-                        </span>
-                        {branch === b.id && <Check size={13} className="text-carrot" />}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <div className="mt-3 flex items-start gap-2 text-xs text-coal-muted">
-                <MapPin size={13} className="mt-0.5 flex-shrink-0 text-coal-dim" />
-                {selectedBranch.address}
-              </div>
-              <div className="mt-1.5 flex items-start gap-2 text-xs text-coal-muted">
-                <Clock size={13} className="mt-0.5 flex-shrink-0 text-coal-dim" />
-                {selectedBranch.hours}
-              </div>
+              <BranchSelect value={branch} onChange={setBranch} showDetails />
             </div>
           )}
 
           <button
-            onClick={() => setSubmitted(true)}
+            onClick={() => navigate('/checkout', { state: { branch } })}
             className="mt-5 w-full rounded-pill bg-carrot py-4 font-bold text-white transition-all hover:bg-carrot-deep hover:shadow-glow"
           >
-            {hasScooter ? 'Submit Inquiry' : 'Place Order'}
+            Proceed to Checkout
           </button>
           <Link
             to="/shop"

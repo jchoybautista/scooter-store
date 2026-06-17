@@ -9,11 +9,12 @@ interface Props {
 }
 
 export default function FleetCarousel({ products, brands }: Props) {
-  const [start, setStart] = useState(0)
+  const [page, setPage] = useState(0)
   const perPage = 3
   const total = products.length
-  const canPrev = start > 0
-  const canNext = start + perPage < total
+  const totalPages = Math.ceil(total / perPage)
+  const canPrev = page > 0
+  const canNext = page < totalPages - 1
 
   return (
     <section className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
@@ -23,7 +24,7 @@ export default function FleetCarousel({ products, brands }: Props) {
       </div>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {products.slice(start, start + perPage).map((p) => (
+        {products.slice(page * perPage, page * perPage + perPage).map((p) => (
           <ProductCard
             key={p.id}
             product={p}
@@ -32,22 +33,37 @@ export default function FleetCarousel({ products, brands }: Props) {
         ))}
       </div>
 
-      <div className="mt-14 flex justify-center gap-3">
+      <div className="mt-14 flex items-center justify-center gap-4">
         <button
-          onClick={() => setStart((s) => Math.max(0, s - 1))}
+          onClick={() => setPage((p) => Math.max(0, p - 1))}
           disabled={!canPrev}
           aria-label="Previous"
-          className="flex h-11 w-11 items-center justify-center bg-carrot text-white transition-opacity hover:opacity-80 disabled:opacity-40"
+          className="flex h-9 w-9 items-center justify-center rounded-full border border-paper-line text-coal-muted transition-colors hover:border-carrot hover:bg-carrot hover:text-white disabled:opacity-40"
         >
-          <ChevronLeft size={20} />
+          <ChevronLeft size={17} />
         </button>
+        <div className="flex items-center gap-2">
+          {Array.from({ length: totalPages }).map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setPage(i)}
+              aria-label={`Page ${i + 1}`}
+              className="relative h-1.5 overflow-hidden rounded-pill transition-all duration-300"
+              style={{ width: i === page ? 34 : 10, background: 'rgba(0,0,0,0.15)' }}
+            >
+              {i === page && (
+                <span className="absolute inset-0 rounded-pill bg-carrot" />
+              )}
+            </button>
+          ))}
+        </div>
         <button
-          onClick={() => setStart((s) => Math.min(total - perPage, s + 1))}
+          onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
           disabled={!canNext}
           aria-label="Next"
-          className="flex h-11 w-11 items-center justify-center bg-carrot text-white transition-opacity hover:opacity-80 disabled:opacity-40"
+          className="flex h-9 w-9 items-center justify-center rounded-full border border-paper-line text-coal-muted transition-colors hover:border-carrot hover:bg-carrot hover:text-white disabled:opacity-40"
         >
-          <ChevronRight size={20} />
+          <ChevronRight size={17} />
         </button>
       </div>
     </section>
