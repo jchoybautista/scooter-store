@@ -1,20 +1,54 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 # Velocità Scooter Store — Project Context
 
 ## What This Is
 
-A fictional premium scooter storefront called **Velocità**. Built as a React 19 + TypeScript + Vite + Tailwind CSS v3 SPA. No backend — all product data is seeded in-memory. The visual identity is Italian-premium: orange (`#F95D0E` = `carrot`) as the accent color, dark navy (`night`) as secondary.
+A fictional premium scooter storefront called **Velocità** with a companion admin panel. The storefront is a React 19 + TypeScript + Vite + Tailwind CSS v3 SPA. There is no real backend — product data is seeded in-memory and all state (cart, favorites, orders, auth) lives in localStorage. A Supabase integration exists but is optional (see Data Layer below). The visual identity is Italian-premium: orange (`#F95D0E` = `carrot`) as the accent color, dark navy (`night`) as secondary.
+
+## Commands
+
+Run these from the repo root (storefront) or from `admin/` (admin panel):
+
+```bash
+# Storefront
+npm run dev        # Start dev server (Vite, port 5173)
+npm run build      # Type-check + production build
+npm run lint       # ESLint
+npm run preview    # Serve the production build
+
+# Admin (cd admin/ first)
+npm run dev        # Start admin dev server (port 5174 by default)
+npm run build
+npm run lint
+```
+
+There are no tests in this project.
 
 ## Tech Stack
 
 - **React 19** + **TypeScript** + **Vite**
 - **Tailwind CSS v3** — custom tokens in `tailwind.config.js`
-- **React Router v6** for client-side routing
+- **React Router v7** for client-side routing
 - **Lucide React** for icons
-- **localStorage** for cart and favorites persistence
+- **Framer Motion** for animations
+- **Recharts** for charts (admin dashboard)
+- **@supabase/supabase-js** — optional data layer
+- **localStorage** for all client-side persistence (cart, favorites, orders, auth)
+
+## Monorepo Layout
+
+```
+/                  — Storefront (main app)
+admin/             — Admin panel (separate Vite app, basename="/admin")
+supabase/          — schema.sql + seed.sql (reference only)
+```
 
 ## Design Tokens (Tailwind)
 
-Key custom colors defined in `tailwind.config.js`:
+Defined in `tailwind.config.js`:
 
 | Token | Value | Use |
 |---|---|---|
@@ -33,39 +67,109 @@ Key custom colors defined in `tailwind.config.js`:
 
 Custom border radius: `rounded-card`, `rounded-pill`.
 
-## Project Structure
+## Storefront Structure
 
 ```
 src/
-  App.tsx                  — Routes + context providers (FavoritesProvider > CartProvider)
-  types.ts                 — Product, Brand, CartItem interfaces
+  App.tsx                    — Routes + context providers (Auth > Orders > Favorites > Cart)
+  types.ts                   — Product, Brand, CartItem interfaces
   data/
-    seed.ts                — All product/brand data (in-memory)
-    store.ts               — Async wrappers (getProducts, getBrands, getProductBySlug)
+    seed.ts                  — All product/brand data (in-memory)
+    store.ts                 — Async wrappers (getProducts, getBrands, getProductBySlug)
   lib/
-    branches.ts            — Metro Manila pickup branch list (used in Cart + ProductDetail)
-    cartContext.tsx         — CartProvider with localStorage; addItem, removeItem, updateQty, clearCart
-    favoritesContext.tsx    — FavoritesProvider with localStorage; toggle, isFav, ids (Set<string>)
-    format.ts              — formatPrice, effectivePrice helpers
-    useAsync.ts            — Generic async data hook
+    authContext.tsx           — AuthProvider: mocked login/logout, persisted to localStorage
+    cartContext.tsx           — CartProvider: addItem, removeItem, updateQty, clearCart
+    favoritesContext.tsx      — FavoritesProvider: toggle, isFav, ids (Set<string>)
+    ordersContext.tsx         — OrdersProvider: addOrder, cancelOrder; seeds 3 demo orders
+    branches.ts              — Metro Manila pickup branch list
+    customers.ts             — Customer helper utilities
+    supabase.ts              — Supabase client (null when env vars absent)
+    format.ts                — formatPrice, effectivePrice helpers
+    useAsync.ts              — Generic async data hook
   components/
-    Logo.tsx               — SVG logo
-    ScooterArt.tsx         — Renders product image or fallback art
+    Logo.tsx                 — SVG logo
+    ScooterArt.tsx           — Renders product image or fallback art
   storefront/
-    StorefrontLayout.tsx   — Navbar + Outlet + Footer wrapper
+    StorefrontLayout.tsx     — Navbar + TopBar + Outlet + Footer wrapper
     components/
-      Navbar.tsx           — Fixed navbar: Logo + nav links left, phone + heart + cart right
-      ProductCard.tsx      — Reusable card used in Shop, Favorites, FleetCarousel
-      FleetCarousel.tsx    — "Choose Your Scooter" carousel on Home — uses ProductCard
-      HeroSection.tsx
-      TestimonialsSection.tsx
+      Navbar.tsx             — Fixed navbar: Logo + nav links left, phone + heart + cart right
+      TopBar.tsx             — Announcement bar above navbar
+      ProductCard.tsx        — Reusable card used in Shop, Favorites, FleetCarousel
+      FleetCarousel.tsx      — "Choose Your Scooter" carousel on Home
+      HeroSlider.tsx         — Hero slideshow on Home
+      Footer.tsx
+      BranchSelect.tsx       — Branch picker dropdown (shared between Cart + ProductDetail)
+      CancelOrderModal.tsx   — Confirmation modal for order cancellation
     pages/
-      Home.tsx             — Landing page: Hero, Fleet carousel, Testimonials
-      Shop.tsx             — Product grid with type + brand filters
-      ProductDetail.tsx    — Full product page with gallery, color selector, specs, cart CTA
-      Cart.tsx             — Cart page with qty stepper, branch picker, order summary
-      Favorites.tsx        — Saved products grid
+      Home.tsx               — Landing page: HeroSlider, FleetCarousel, Testimonials
+      Shop.tsx               — Product grid with type + brand filters
+      ProductDetail.tsx      — Full product page with gallery, color selector, specs, cart CTA
+      Cart.tsx               — Cart with qty stepper, branch picker, order summary
+      Checkout.tsx           — Checkout form (name, email, phone, payment method)
+      OrderConfirmed.tsx     — Post-checkout confirmation screen
+      ManageOrders.tsx       — Order history list
+      OrderDetail.tsx        — Single order detail + cancel action
+      Favorites.tsx          — Saved products grid
+      SignIn.tsx             — Sign-in page (outside StorefrontLayout)
+      CartPlaceholder.tsx    — Empty cart state
 ```
+
+## Admin Panel Structure
+
+Separate Vite app at `admin/`, served under `/admin` basename.
+
+```
+admin/src/
+  App.tsx          — Routes (login → RequireAuth → AdminLayout)
+  pages/
+    Login.tsx      — Admin login (session stored in localStorage via adminAuth)
+    Dashboard.tsx  — Stats, charts, Philippines map with branch markers
+    Orders.tsx     — Order list with status filters
+    OrderDetail.tsx
+    Products.tsx   — Product list with search
+    ProductForm.tsx — Add/edit product form (with image upload)
+    Settings.tsx
+  components/
+    AdminLayout.tsx — Sidebar + Outlet
+  lib/
+    adminAuth.ts   — getAdminSession / setAdminSession helpers
+```
+
+## Routes (Storefront)
+
+| Path | Component |
+|---|---|
+| `/sign-in` | SignIn (standalone, no layout) |
+| `/` | Home |
+| `/shop` | Shop (all products) |
+| `/shop/:type` | Shop filtered by type |
+| `/product/:slug` | ProductDetail |
+| `/cart` | Cart |
+| `/checkout` | Checkout |
+| `/order-confirmed` | OrderConfirmed |
+| `/orders` | ManageOrders |
+| `/orders/:orderNumber` | OrderDetail |
+| `/favorites` | Favorites |
+| `*` | Home (fallback) |
+
+## Data Layer
+
+The app runs fully on in-memory seed data by default. To enable Supabase, create a `.env` file:
+
+```
+VITE_SUPABASE_URL=https://YOUR-PROJECT.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-public-key
+```
+
+`src/lib/supabase.ts` exports `isSupabaseConfigured` (boolean) and `supabase` (client or null). Check `isSupabaseConfigured` before using the client.
+
+## Auth
+
+Auth is fully mocked — `authContext.tsx` hardcodes a single user (`MOCK_USER`) and persists login state to localStorage under `velocita-auth`. No real auth provider is wired up.
+
+## Orders
+
+`ordersContext.tsx` seeds 3 demo orders on first load (persisted to `velocita-orders` in localStorage). `OrderStatus` values: `pending | processing | ready | completed | cancelled`. `STATUS_LABEL` and `STATUS_COLOR` maps are exported from the same file.
 
 ## Key Conventions
 
@@ -83,7 +187,7 @@ When a scooter brand tab is selected (e.g. Vespa), accessories/helmets/tires fro
 ### ProductDetail — Scooter-only features
 - Color variant selector
 - Pickup branch `<select>` dropdown (from `branches.ts`)
-- "Add to favorites" toggle button (replaces "Keep browsing")
+- "Add to favorites" toggle button
 
 ### Favorites
 - Heart icon in top-right of every ProductCard thumbnail (toggle)
@@ -92,23 +196,10 @@ When a scooter brand tab is selected (e.g. Vespa), accessories/helmets/tires fro
 - `/favorites` route shows saved items grid
 
 ### Testimonials (Home.tsx) — "Editorial Spotlight"
-- Full-width dark band (`#0E0E12`), matching the "How it works" section
-- One testimonial shown at a time: large rider portrait (rounded `28px`, `4/5` aspect) on the left, pull-quote on the right
-- Pull-quote in `font-display` `text-2xl` white; orange filled Lucide `Quote` icon above it; 5 carrot stars; name + `tag` sub-label (e.g. "Vespa GTS owner")
+- Full-width dark band (`#0E0E12`)
+- One testimonial shown at a time: large rider portrait on the left, pull-quote on the right
+- Pull-quote in `font-display` `text-2xl` white; orange filled Lucide `Quote` icon above it; 5 carrot stars; name + `tag` sub-label
 - Navigation: avatar rail centered at bottom (active avatar gets `ring-carrot`) flanked by prev/next arrows
-- Each testimonial has a `tag` field — a short descriptor derived from its review text
-
-## Routes
-
-| Path | Component |
-|---|---|
-| `/` | Home |
-| `/shop` | Shop (all products) |
-| `/shop/:type` | Shop filtered by type (scooters, parts, accessories) |
-| `/product/:slug` | ProductDetail |
-| `/cart` | Cart |
-| `/favorites` | Favorites |
-| `*` | Home (fallback) |
 
 ## Pickup Branches (branches.ts)
 
