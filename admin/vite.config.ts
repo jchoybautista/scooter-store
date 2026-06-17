@@ -48,7 +48,7 @@ function fileUploadPlugin(uploadDir: string): Plugin {
 
 export default defineConfig({
   plugins: [react(), fileUploadPlugin(resolve(rootPublic, 'images/products'))],
-  base: '/admin',
+  base: '/',
   // Serve the storefront's public folder so /images/products/* resolves in dev
   publicDir: rootPublic,
   server: {
