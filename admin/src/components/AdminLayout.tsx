@@ -3,7 +3,7 @@ import { Outlet, NavLink, Link, useLocation, useNavigate } from 'react-router-do
 import {
   LayoutDashboard, ClipboardList, Package, Bell, Search,
   ChevronRight, Settings2, LogOut, ShoppingBag, AlertTriangle,
-  MapPin, MessageSquare, X, Users, UserCheck,
+  MapPin, MessageSquare, X, Users, UserCheck, Menu,
 } from 'lucide-react'
 import { getAdminSession, adminLogout } from '../lib/adminAuth'
 import { NotificationsProvider, useNotifications } from '../lib/notificationsContext'
@@ -138,16 +138,38 @@ function Layout() {
   const navigate = useNavigate()
   const title = getTitle(location.pathname, location.search)
   const session = getAdminSession()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  // Close sidebar on route change (mobile nav tap)
+  useEffect(() => {
+    setSidebarOpen(false)
+  }, [location.pathname, location.search])
 
   function handleLogout() {
     adminLogout()
     navigate('/login', { replace: true })
   }
 
+  const closeNav = () => setSidebarOpen(false)
+
   return (
     <div className="min-h-screen bg-[#F0F1F5]">
+
+      {/* ── Mobile backdrop ──────────────────────── */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          onClick={closeNav}
+          aria-hidden="true"
+        />
+      )}
+
       {/* ── Sidebar ─────────────────────────────── */}
-      <aside className="fixed top-0 left-0 h-full w-[220px] bg-[#0F1117] flex flex-col z-30">
+      <aside
+        className={`fixed top-0 left-0 h-full w-[220px] bg-[#0F1117] flex flex-col z-40 transition-transform duration-300 ease-in-out ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        }`}
+      >
         {/* Logo */}
         <div className="px-5 pt-6 pb-5">
           <div className="flex items-center gap-3">
@@ -171,6 +193,7 @@ function Layout() {
             <NavLink
               key={to}
               to={to}
+              onClick={closeNav}
               className={({ isActive }) =>
                 `group flex items-center justify-between px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-150 ${
                   isActive
@@ -207,6 +230,7 @@ function Layout() {
                 <Link
                   key={to}
                   to={to}
+                  onClick={closeNav}
                   className={`group flex items-center justify-between px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-150 ${
                     isActive
                       ? 'bg-white/10 text-white'
@@ -233,6 +257,7 @@ function Layout() {
               <NavLink
                 key={to}
                 to={to}
+                onClick={closeNav}
                 className={({ isActive }) =>
                   `group flex items-center justify-between px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-150 ${
                     isActive
@@ -283,18 +308,25 @@ function Layout() {
       </aside>
 
       {/* ── Topbar ──────────────────────────────── */}
-      <header className="fixed top-0 left-[220px] right-0 h-[60px] bg-white/80 backdrop-blur-md border-b border-paper-line flex items-center justify-between px-6 z-20">
-        {/* Left: breadcrumb */}
+      <header className="fixed top-0 left-0 lg:left-[220px] right-0 h-[60px] bg-white/80 backdrop-blur-md border-b border-paper-line flex items-center justify-between px-4 lg:px-6 z-20">
+        {/* Left: hamburger (mobile) + breadcrumb */}
         <div className="flex items-center gap-2">
-          <span className="text-coal-dim text-sm">Velocità</span>
-          <ChevronRight size={13} className="text-coal-dim" />
+          <button
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Open navigation"
+            className="lg:hidden w-9 h-9 flex items-center justify-center rounded-xl text-coal-muted hover:text-coal hover:bg-[#F0F1F5] transition-colors mr-1"
+          >
+            <Menu size={18} />
+          </button>
+          <span className="text-coal-dim text-sm hidden sm:inline">Velocità</span>
+          <ChevronRight size={13} className="text-coal-dim hidden sm:inline" />
           <span className="text-coal text-sm font-semibold">{title}</span>
         </div>
 
         {/* Right: actions */}
-        <div className="flex items-center gap-3">
-          {/* Search */}
-          <div className="hidden sm:flex items-center gap-2 bg-[#F0F1F5] rounded-xl px-3 py-2 w-44">
+        <div className="flex items-center gap-2 lg:gap-3">
+          {/* Search — hidden on small mobile */}
+          <div className="hidden sm:flex items-center gap-2 bg-[#F0F1F5] rounded-xl px-3 py-2 w-36 lg:w-44">
             <Search size={13} className="text-coal-dim flex-shrink-0" />
             <input
               type="text"
@@ -324,7 +356,7 @@ function Layout() {
       </header>
 
       {/* ── Content ─────────────────────────────── */}
-      <main className="ml-[220px] mt-[60px] p-6 min-h-screen">
+      <main className="ml-0 lg:ml-[220px] mt-[60px] p-4 lg:p-6 min-h-screen">
         <Outlet />
       </main>
     </div>

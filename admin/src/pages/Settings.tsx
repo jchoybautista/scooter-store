@@ -768,19 +768,21 @@ function ResetTab({ onToast }: { onToast: (msg: string) => void }) {
     <div className="space-y-4 max-w-2xl">
       {/* Master reset card */}
       <div className="bg-white rounded-2xl border-2 border-amber-200 shadow-sm p-5">
-        <div className="flex items-start gap-4">
-          <div className="w-11 h-11 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0">
-            <RotateCcw size={20} className="text-amber-500" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-coal text-[15px]">Reset Everything</h3>
-            <p className="text-[13px] text-coal-muted mt-1 leading-relaxed">
-              Restore all products, orders, and users back to their original demo state in one click. Use this to quickly undo all changes for a fresh demo.
-            </p>
+        <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+          <div className="flex items-start gap-4 flex-1 min-w-0">
+            <div className="w-11 h-11 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0">
+              <RotateCcw size={20} className="text-amber-500" />
+            </div>
+            <div className="min-w-0">
+              <h3 className="font-bold text-coal text-[15px]">Reset Everything</h3>
+              <p className="text-[13px] text-coal-muted mt-1 leading-relaxed">
+                Restore all products, orders, and users back to their original demo state in one click. Use this to quickly undo all changes for a fresh demo.
+              </p>
+            </div>
           </div>
           <button
             onClick={() => setConfirm('all')}
-            className="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 text-white text-[13px] font-semibold hover:bg-amber-600 transition-colors"
+            className="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 text-white text-[13px] font-semibold hover:bg-amber-600 transition-colors self-start sm:self-auto"
           >
             <RotateCcw size={14} />
             Reset All
@@ -790,17 +792,19 @@ function ResetTab({ onToast }: { onToast: (msg: string) => void }) {
 
       {/* Individual reset cards */}
       {ITEMS.map(({ key, icon: Icon, iconBg, iconColor, title, desc }) => (
-        <div key={key} className="bg-white rounded-2xl border border-paper-line shadow-sm p-5 flex items-start gap-4">
-          <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${iconBg}`}>
-            <Icon size={20} className={iconColor} />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-coal text-[14px]">{title}</h3>
-            <p className="text-[13px] text-coal-muted mt-1 leading-relaxed">{desc}</p>
+        <div key={key} className="bg-white rounded-2xl border border-paper-line shadow-sm p-5 flex flex-col sm:flex-row sm:items-start gap-4">
+          <div className="flex items-start gap-4 flex-1 min-w-0">
+            <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${iconBg}`}>
+              <Icon size={20} className={iconColor} />
+            </div>
+            <div className="min-w-0">
+              <h3 className="font-bold text-coal text-[14px]">{title}</h3>
+              <p className="text-[13px] text-coal-muted mt-1 leading-relaxed">{desc}</p>
+            </div>
           </div>
           <button
             onClick={() => setConfirm(key)}
-            className="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl border border-paper-line text-[13px] font-semibold text-coal-muted hover:text-coal hover:border-coal-dim transition-colors"
+            className="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl border border-paper-line text-[13px] font-semibold text-coal-muted hover:text-coal hover:border-coal-dim transition-colors self-start sm:self-auto"
           >
             <RotateCcw size={13} />
             Reset
@@ -871,27 +875,29 @@ export default function Settings() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 bg-white rounded-xl border border-paper-line p-1 w-fit shadow-sm">
-        {([
-          { key: 'account',   label: 'My Account' },
-          { key: 'users',     label: 'Users' },
-          { key: 'customers', label: 'Customers' },
-          { key: 'reset',     label: 'Reset to Default' },
-        ] as const).map(({ key, label }) => (
-          <button
-            key={key}
-            onClick={() => setTab(key)}
-            className={`px-5 py-1.5 rounded-lg text-[13px] font-semibold transition-all ${
-              tab === key
-                ? key === 'reset'
-                  ? 'bg-amber-500 text-white shadow-sm'
-                  : 'bg-carrot text-white shadow-sm'
-                : 'text-coal-muted hover:text-coal hover:bg-paper-soft'
-            }`}
-          >
-            {label}
-          </button>
-        ))}
+      <div className="overflow-x-auto -mx-1 px-1 pb-0.5">
+        <div className="flex items-center gap-1 bg-white rounded-xl border border-paper-line p-1 w-max shadow-sm">
+          {([
+            { key: 'account',   label: 'My Account' },
+            { key: 'users',     label: 'Users' },
+            { key: 'customers', label: 'Customers' },
+            { key: 'reset',     label: 'Reset to Default' },
+          ] as const).map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setTab(key)}
+              className={`px-4 sm:px-5 py-1.5 rounded-lg text-[13px] font-semibold transition-all whitespace-nowrap ${
+                tab === key
+                  ? key === 'reset'
+                    ? 'bg-amber-500 text-white shadow-sm'
+                    : 'bg-carrot text-white shadow-sm'
+                  : 'text-coal-muted hover:text-coal hover:bg-paper-soft'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Content */}

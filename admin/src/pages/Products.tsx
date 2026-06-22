@@ -212,20 +212,22 @@ export default function Products() {
       </div>
 
       {/* Filter tabs */}
-      <div className="flex items-center gap-1 bg-white rounded-xl border border-paper-line p-1 w-fit shadow-sm">
-        {FILTER_TABS.map(({ key, label }) => (
-          <button
-            key={key}
-            onClick={() => setFilter(key)}
-            className={`px-4 py-1.5 rounded-lg text-[13px] font-semibold transition-all ${
-              filter === key
-                ? 'bg-carrot text-white shadow-sm'
-                : 'text-coal-muted hover:text-coal hover:bg-paper-soft'
-            }`}
-          >
-            {label}
-          </button>
-        ))}
+      <div className="overflow-x-auto -mx-1 px-1 pb-0.5">
+        <div className="flex items-center gap-1 bg-white rounded-xl border border-paper-line p-1 w-max shadow-sm">
+          {FILTER_TABS.map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setFilter(key)}
+              className={`px-3 sm:px-4 py-1.5 rounded-lg text-[13px] font-semibold transition-all whitespace-nowrap ${
+                filter === key
+                  ? 'bg-carrot text-white shadow-sm'
+                  : 'text-coal-muted hover:text-coal hover:bg-paper-soft'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Product grid */}

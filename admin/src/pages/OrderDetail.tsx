@@ -69,16 +69,16 @@ export default function OrderDetail() {
   return (
     <div className="space-y-5 max-w-5xl">
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:justify-between">
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate('/orders')}
-            className="p-2 rounded-lg text-coal-muted hover:text-coal hover:bg-white border border-paper-line transition-colors"
+            className="p-2 rounded-lg text-coal-muted hover:text-coal hover:bg-white border border-paper-line transition-colors flex-shrink-0"
           >
             <ArrowLeft size={17} />
           </button>
           <div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
               <h1 className="text-xl font-bold text-coal">{order.orderNumber}</h1>
               <StatusBadge status={order.status} />
             </div>
@@ -87,8 +87,8 @@ export default function OrderDetail() {
         </div>
 
         {!isFinal && (
-          <div className="flex items-center gap-2">
-            <label className="text-sm text-coal-muted font-medium">Update Status:</label>
+          <div className="flex items-center gap-2 pl-12 sm:pl-0">
+            <label className="text-sm text-coal-muted font-medium whitespace-nowrap">Update Status:</label>
             <SelectField
               value={order.status}
               onChange={(e) => handleStatusChange(e.target.value as StatusKey)}
@@ -151,9 +151,9 @@ export default function OrderDetail() {
         </div>
       )}
 
-      <div className="grid grid-cols-3 gap-5">
-        {/* Items — spans 2 cols */}
-        <div className="col-span-2 space-y-5">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        {/* Items — spans 2 cols on desktop */}
+        <div className="lg:col-span-2 space-y-5">
           <div className="bg-white rounded-xl border border-paper-line overflow-hidden">
             <div className="px-5 py-4 border-b border-paper-line">
               <h2 className="text-sm font-semibold text-coal">Order Items</h2>

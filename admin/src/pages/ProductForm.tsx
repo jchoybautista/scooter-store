@@ -283,8 +283,8 @@ export default function ProductForm() {
 
   return (
     <div className="flex gap-6 relative">
-      {/* ── Left nav ─────────────────────────────── */}
-      <aside className="w-[180px] flex-shrink-0">
+      {/* ── Left nav (desktop only) ───────────────── */}
+      <aside className="hidden lg:block w-[180px] flex-shrink-0">
         <div className="sticky top-[76px] bg-white rounded-2xl border border-paper-line shadow-sm p-2 space-y-0.5">
           <p className="text-[10px] font-bold text-coal-dim uppercase tracking-widest px-3 pt-2 pb-1">Sections</p>
           {SECTIONS.map((s) => (
@@ -302,14 +302,14 @@ export default function ProductForm() {
       </aside>
 
       {/* ── Form ─────────────────────────────────── */}
-      <form onSubmit={handleSubmit} className="flex-1 max-w-2xl space-y-5 pb-16">
+      <form onSubmit={handleSubmit} className="flex-1 max-w-2xl space-y-5 pb-16 min-w-0">
         {/* Header */}
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-start justify-between gap-3 flex-wrap">
           <div>
             <h1 className="text-[20px] font-bold text-coal">{isEdit ? 'Edit Product' : 'Add Product'}</h1>
             <p className="text-[13px] text-coal-muted mt-0.5">{isEdit ? 'Update product details' : 'Create a new product listing'}</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-shrink-0">
             <button
               type="button"
               onClick={() => navigate('/products')}
